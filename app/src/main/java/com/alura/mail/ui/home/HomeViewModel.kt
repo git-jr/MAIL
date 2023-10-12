@@ -25,6 +25,9 @@ class HomeViewModel : ViewModel() {
     }
 
     fun changeSelectedTab(indexTab: Int) {
-        _uiState.value = _uiState.value.copy(showEmailsList = indexTab == 0)
+        _uiState.value = _uiState.value.copy(
+            showEmailsList = indexTab == 0,
+            selectedTab = indexTab
+        )
     }
 }

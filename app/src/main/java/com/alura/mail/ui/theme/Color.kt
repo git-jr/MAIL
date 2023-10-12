@@ -17,3 +17,15 @@ val Pink40 = Color(0xFF7D5260)
 val PrimaryContainerLight = Color(0xFFFEDBC8)
 val SurfaceBeigeLight = Color(0xFFF5ECED)
 val OnSurfaceBeigeLight = Color(0xFF807D7C)
+
+
+val backgroundProfileColors = listOf(
+    0xFFFE8966,
+    0xFF5F96F5,
+    0xFF5FF5A3,
+    0xFF9B5FF5,
+    0xFFF55F5F,
+    0xFF5FD4F5,
+    0xFFDAA844,
+    0xFFF55FEE,
+)

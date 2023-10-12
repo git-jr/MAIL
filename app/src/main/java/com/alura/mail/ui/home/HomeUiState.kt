@@ -10,8 +10,9 @@ data class HomeUiState(
 data class Email(
     val id: Int,
     val subject: String,
-    val preview: String,
-    val time: String,
+    val content: String,
+    val time: Long,
+    val color: Long,
     val user: User,
 )
 

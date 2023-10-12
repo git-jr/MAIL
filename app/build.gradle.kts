@@ -63,6 +63,7 @@ dependencies {
 
     implementation(libs.coil.compose)
     implementation(libs.viewmodel.compose)
+    implementation(libs.kotlinx.datetime)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
