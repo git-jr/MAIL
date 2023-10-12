@@ -1,6 +1,7 @@
 package com.alura.mail.ui.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -9,7 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
@@ -29,22 +30,27 @@ import com.alura.mail.extensions.toFormattedDate
 
 
 @Composable
-fun ListPosts(emails: List<Email>) {
+fun ListPosts(emails: List<Email>, onClick: (Email) -> Unit) {
     LazyColumn(
         modifier = Modifier
             .background(MaterialTheme.colorScheme.background)
             .fillMaxSize(),
     ) {
         items(emails) { email ->
-            EmailItem(email)
+            EmailItem(email) { onClick(email) }
         }
     }
 }
 
 
 @Composable
-fun EmailItem(email: Email) {
+fun EmailItem(
+    email: Email,
+    onClick: () -> Unit,
+) {
     ListItem(
+        modifier = Modifier
+            .clickable { onClick() },
         headlineContent = {
             Text(
                 text = email.user.name,
@@ -71,11 +77,10 @@ fun EmailItem(email: Email) {
         },
 
         leadingContent = {
-
             Box(
                 modifier = Modifier
                     .size(40.dp)
-                    .clip(RoundedCornerShape(30.dp))
+                    .clip(CircleShape)
                     .background(Color(email.color)),
                 contentAlignment = Alignment.Center,
             ) {
@@ -104,7 +109,8 @@ fun EmailItem(email: Email) {
 @Composable
 fun EmailItemPreview() {
     EmailItem(
-        email = EmailDao().getEmails().first()
+        email = EmailDao().getEmails().first(),
+        onClick = { }
     )
 }
 

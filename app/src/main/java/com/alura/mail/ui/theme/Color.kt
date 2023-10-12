@@ -18,6 +18,8 @@ val PrimaryContainerLight = Color(0xFFFEDBC8)
 val SurfaceBeigeLight = Color(0xFFF5ECED)
 val OnSurfaceBeigeLight = Color(0xFF807D7C)
 
+val InverseOnSurface = Color(0xFF3886FF)
+
 
 val backgroundProfileColors = listOf(
     0xFFFE8966,

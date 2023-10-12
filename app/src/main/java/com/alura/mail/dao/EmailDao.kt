@@ -17,7 +17,7 @@ class EmailDao {
                 Email(
                     id = index,
                     subject = "Curso de Kotlin $index",
-                    content = "Olá, tudo bem? Estamos aqui para te avisar que o curso de Android está com uma promoção imperdível. Corra e garanta já a sua vaga!",
+                    content = "Olá, tudo bem? \n\nEstamos aqui para te avisar que o curso de Android está com uma promoção imperdível. \nCorra e garanta já a sua vaga! \n\n",
                     time = currentTime,
                     color = backgroundProfileColors.random(),
                     user = User(
@@ -78,15 +78,3 @@ fun generateRandomDateInMillis(weeksAgo: Int): Long {
 
     return (startTime until currentDate).random()
 }
-
-
-//private fun generateRandomDateInMillisJava(weeksAgo: Int = 150): Long {
-//    val currentDate = System.currentTimeMillis()
-//
-//    val startTime = Calendar.getInstance().apply {
-//        timeInMillis = System.currentTimeMillis()
-//        add(Calendar.WEEK_OF_MONTH, -weeksAgo)
-//    }.timeInMillis
-//
-//    return (startTime until currentDate).random()
-//}
