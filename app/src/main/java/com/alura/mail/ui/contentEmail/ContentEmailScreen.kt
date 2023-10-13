@@ -23,6 +23,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,14 +50,29 @@ fun ContentEmailScreen(
             .fillMaxSize()
             .verticalScroll(rememberScrollState()),
     ) {
+        val isOriginalLanguage = false
+        var alreadyTranslated by remember {
+            mutableStateOf(false)
+        }
+
         EmailHeader(email)
-        EmailSubHeader(textTranslateFor)
+        if (!isOriginalLanguage) {
+            EmailSubHeader(
+                textTranslateFor = textTranslateFor,
+                alreadyTranslated = alreadyTranslated,
+                onClick = { alreadyTranslated = !alreadyTranslated }
+            )
+        }
         EmailContent(email)
     }
 }
 
 @Composable
-private fun EmailSubHeader(textTranslateFor: String) {
+private fun EmailSubHeader(
+    textTranslateFor: String,
+    alreadyTranslated: Boolean,
+    onClick: () -> Unit = {}
+) {
     Spacer(modifier = Modifier.height(8.dp))
     Row(
         modifier = Modifier
@@ -65,7 +84,7 @@ private fun EmailSubHeader(textTranslateFor: String) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .clickable { }
+                .clickable { onClick() }
                 .padding(16.dp)
         ) {
             Icon(
@@ -77,25 +96,35 @@ private fun EmailSubHeader(textTranslateFor: String) {
 
             Spacer(modifier = Modifier.size(16.dp))
 
-            Text(
-                text = textTranslateFor,
-                fontSize = MaterialTheme.typography.titleSmall.fontSize,
-                color = MaterialTheme.colorScheme.inverseOnSurface,
-                fontWeight = FontWeight.Bold
-            )
+            Column {
+                Text(
+                    text = textTranslateFor,
+                    fontSize = MaterialTheme.typography.titleSmall.fontSize,
+                    color = if (alreadyTranslated) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.inverseOnSurface,
+                    fontWeight = if (alreadyTranslated) FontWeight.Normal else FontWeight.Bold
+                )
+                if (alreadyTranslated) {
+                    Text(
+                        text = "Mostrar original",
+                        fontSize = MaterialTheme.typography.labelMedium.fontSize,
+                        color = MaterialTheme.colorScheme.inverseOnSurface,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
         }
 
         IconButton(
-            modifier = Modifier.padding(horizontal = 16.dp),
+            modifier = Modifier.padding(horizontal = 4.dp),
             onClick = { /*TODO*/ }
         ) {
             Icon(
                 imageVector = Icons.Outlined.Settings,
                 contentDescription = "Mais informações",
                 tint = Color.Gray,
+                modifier = Modifier.size(24.dp)
             )
         }
-
     }
 }
 

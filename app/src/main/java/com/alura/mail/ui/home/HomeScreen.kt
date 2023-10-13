@@ -114,7 +114,7 @@ fun HomeScreen(onBack: () -> Unit) {
                         selectedEmail?.let {
                             ContentEmailScreen(
                                 email = it,
-                                textTranslateFor = "Traduzir para o {idioma}"
+                                textTranslateFor = "Traduzir do Inglês para Português"
                             )
                         }
                     }
