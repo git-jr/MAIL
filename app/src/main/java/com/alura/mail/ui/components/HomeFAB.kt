@@ -1,22 +1,25 @@
 package com.alura.mail.ui.components
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 
-
 @Composable
-fun HomeFAB() {
-    FloatingActionButton(
+fun HomeFAB(expanded: Boolean) {
+    ExtendedFloatingActionButton(
         onClick = { /*TODO*/ },
-    ) {
-        Icon(
-            imageVector = Icons.Filled.Add,
-            contentDescription = "adicionar",
-            tint = MaterialTheme.colorScheme.onSecondaryContainer
-        )
-    }
+        text = { Text(text = "Escrever", color = MaterialTheme.colorScheme.primary) },
+        icon = {
+            Icon(
+                imageVector = Icons.Outlined.Edit,
+                contentDescription = "adicionar",
+                tint = MaterialTheme.colorScheme.onSecondaryContainer
+            )
+        },
+        expanded = expanded
+    )
 }

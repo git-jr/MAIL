@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ListItem
@@ -30,8 +31,9 @@ import com.alura.mail.extensions.toFormattedDate
 
 
 @Composable
-fun ListPosts(emails: List<Email>, onClick: (Email) -> Unit) {
+fun ListPosts(emails: List<Email>, onClick: (Email) -> Unit, listState: LazyListState) {
     LazyColumn(
+        state = listState,
         modifier = Modifier
             .background(MaterialTheme.colorScheme.background)
             .fillMaxSize(),

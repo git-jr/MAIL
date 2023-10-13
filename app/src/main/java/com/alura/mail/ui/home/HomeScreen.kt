@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -17,6 +18,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,6 +41,14 @@ fun HomeScreen(onBack: () -> Unit) {
     val showEmailsList = state.showEmailsList
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val listState = rememberLazyListState()
+
+    val expandedFab by remember {
+        derivedStateOf {
+            listState.isScrollInProgress.not()
+        }
+    }
+
 
     SetupOnBackPress(
         showEmailList = showEmailsList,
@@ -49,7 +59,6 @@ fun HomeScreen(onBack: () -> Unit) {
     )
 
     var selectedEmail: Email? by remember { mutableStateOf(null) }
-
 
     Scaffold(
         modifier = Modifier
@@ -67,7 +76,7 @@ fun HomeScreen(onBack: () -> Unit) {
         },
         floatingActionButton = {
             if (showEmailsList) {
-                HomeFAB()
+                HomeFAB(expanded = expandedFab)
             }
         },
         bottomBar = {
@@ -87,10 +96,14 @@ fun HomeScreen(onBack: () -> Unit) {
 
                 when (selectedTab) {
                     0 -> {
-                        ListPosts(state.emails) {
-                            selectedEmail = it
-                            homeViewModel.changeSelectedTab(2)
-                        }
+                        ListPosts(
+                            emails = state.emails,
+                            onClick = {
+                                selectedEmail = it
+                                homeViewModel.changeSelectedTab(2)
+                            },
+                            listState = listState
+                        )
                     }
 
                     1 -> {
