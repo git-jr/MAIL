@@ -17,6 +17,8 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,19 +28,26 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.alura.mail.dao.EmailDao
 import com.alura.mail.extensions.toFormattedDate
 
 
 @Composable
-fun ListPosts(emails: List<Email>, onClick: (Email) -> Unit, listState: LazyListState) {
+fun EmailsListScreen(
+    onClick: (Email) -> Unit,
+    listState: LazyListState
+) {
+    val homeViewModel = viewModel<HomeViewModel>()
+    val state by homeViewModel.uiState.collectAsState()
+
     LazyColumn(
         state = listState,
         modifier = Modifier
             .background(MaterialTheme.colorScheme.background)
             .fillMaxSize(),
     ) {
-        items(emails) { email ->
+        items(state.emails) { email ->
             EmailItem(email) { onClick(email) }
         }
     }

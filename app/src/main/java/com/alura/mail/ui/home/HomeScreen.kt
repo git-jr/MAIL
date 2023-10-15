@@ -1,7 +1,6 @@
 package com.alura.mail.ui.home
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -17,6 +16,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -27,15 +27,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.rememberNavController
 import com.alura.mail.ui.components.HomeAppBar
 import com.alura.mail.ui.components.HomeBottomBar
 import com.alura.mail.ui.components.HomeFAB
-import com.alura.mail.ui.contentEmail.ContentEmailScreen
-import com.alura.mail.ui.settings.TranslateSettingsScreen
+import com.alura.mail.ui.navigation.contentEmailScreen
+import com.alura.mail.ui.navigation.emailListRoute
+import com.alura.mail.ui.navigation.emailsListScreen
+import com.alura.mail.ui.navigation.navigateToContentEmailScreen
+import com.alura.mail.ui.navigation.navigateToEmailsListScreen
+import com.alura.mail.ui.navigation.navigateToTranslateSettingsScreen
+import com.alura.mail.ui.navigation.translateSettingsScreen
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-fun HomeScreen(onBack: () -> Unit) {
+fun HomeScreen(
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
+    navController: NavHostController = rememberNavController()
+) {
     val homeViewModel = viewModel<HomeViewModel>()
     val state by homeViewModel.uiState.collectAsState()
     val showEmailsList = state.showEmailsList
@@ -92,34 +104,77 @@ fun HomeScreen(onBack: () -> Unit) {
             modifier = Modifier
                 .padding(paddingValues)
         ) {
-            Crossfade(targetState = state.selectedTab, label = "") { selectedTab ->
 
-                when (selectedTab) {
+            LaunchedEffect(state.selectedTab) {
+                when (state.selectedTab) {
                     0 -> {
-                        ListPosts(
-                            emails = state.emails,
-                            onClick = {
-                                selectedEmail = it
-                                homeViewModel.changeSelectedTab(2)
-                            },
-                            listState = listState
-                        )
+                        navController.navigateToEmailsListScreen()
+
                     }
 
                     1 -> {
-                        TranslateSettingsScreen()
+                        navController.navigateToTranslateSettingsScreen()
                     }
 
                     2 -> {
                         selectedEmail?.let {
-                            ContentEmailScreen(
-                                email = it,
-                                textTranslateFor = "Traduzir do Inglês para Português"
-                            )
+                            navController.navigateToContentEmailScreen(it.id.toString())
                         }
                     }
                 }
             }
+
+            NavHost(
+                navController = navController,
+                startDestination = emailListRoute,
+                modifier = modifier,
+            ) {
+                emailsListScreen(
+                    onOpenEmail = { emailId ->
+                        navController.navigateToContentEmailScreen(emailId)
+                    },
+                    listState = listState
+                )
+
+                contentEmailScreen()
+
+                translateSettingsScreen(
+//                    onBack = {
+//                        navController.navigateUp()
+//                    }
+                )
+            }
+
+            /**
+            Crossfade(targetState = state.selectedTab, label = "") { selectedTab ->
+
+            when (selectedTab) {
+            0 -> {
+            EmailsListScreen(
+            emails = state.emails,
+            onClick = {
+            selectedEmail = it
+            homeViewModel.changeSelectedTab(2)
+            },
+            listState = listState
+            )
+            }
+
+            1 -> {
+            TranslateSettingsScreen()
+            }
+
+            2 -> {
+            selectedEmail?.let {
+            ContentEmailScreen(
+            email = it,
+            textTranslateFor = "Traduzir do Inglês para Português"
+            )
+            }
+            }
+            }
+            }
+             **/
         }
     }
 }
