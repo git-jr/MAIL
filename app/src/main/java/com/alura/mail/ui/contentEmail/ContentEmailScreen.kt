@@ -40,25 +40,25 @@ import com.alura.mail.extensions.toFormattedDate
 import com.alura.mail.model.Email
 
 @Composable
-fun ContentEmailScreen(
-    email: Email,
-    textTranslateFor: String
-) {
+fun ContentEmailScreen(state: ContentEmailUiState) {
+    val email = state.selectedEmail ?: return
+    val textTranslateFor =
+        "Traduzir do ${state.languageIdentified?.name} para ${state.localLanguage?.name}"
+
     Column(
         Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState()),
     ) {
-        val isOriginalLanguage = false
         var alreadyTranslated by remember {
             mutableStateOf(false)
         }
 
         EmailHeader(email)
-        if (!isOriginalLanguage) {
+        if (state.needTranslate) {
             EmailSubHeader(
                 textTranslateFor = textTranslateFor,
-                alreadyTranslated = alreadyTranslated,
+                alreadyTranslated = state.alreadyTranslated,
                 onClick = { alreadyTranslated = !alreadyTranslated }
             )
         }

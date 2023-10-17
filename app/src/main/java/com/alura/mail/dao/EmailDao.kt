@@ -10,68 +10,9 @@ class EmailDao {
         return listOfEmails
     }
 
-//    fun getEmails(): List<Email> {
-//        val emails = mutableListOf<Email>()
-//
-//        // gera 20 emails da ultima semana
-//        repeat(20) { index ->
-//            val currentTime = generateRandomDateInMillis(1)
-//            emails.add(
-//                Email(
-//                    id = index.toString(),
-//                    subject = "Curso de Kotlin $index",
-//                    content = "Olá, tudo bem? \n\nEstamos aqui para te avisar que o curso de Android está com uma promoção imperdível. \nCorra e garanta já a sua vaga! \n\n",
-//                    time = currentTime,
-//                    color = backgroundProfileColors.random(),
-//                    user = User(
-//                        "Alura",
-//                        "https://www.alura.com.br/assets/img/alura-logo-white.1570550707.svg"
-//                    ),
-//                ),
-//            )
-//        }
-//
-//        // gera 20 emails do ano passado
-//        repeat(20) {
-//            val index = it + 20
-//            val currentTime = generateRandomDateInMillis(52)
-//            emails.add(
-//                Email(
-//                    id = index.toString(),
-//                    subject = "Curso de Kotlin $index",
-//                    content = "Olá, tudo bem? Estamos aqui para te avisar que o curso de Android está com uma promoção imperdível. Corra e garanta já a sua vaga!",
-//                    time = currentTime,
-//                    color = backgroundProfileColors.random(),
-//                    user = User(
-//                        "Alura",
-//                        "https://www.alura.com.br/assets/img/alura-logo-white.1570550707.svg"
-//                    ),
-//                ),
-//            )
-//        }
-//
-//        // gera 20 emails de 2 anos atrás
-//        repeat(20) {
-//            val index = it + 40
-//            val currentTime = generateRandomDateInMillis(104)
-//            emails.add(
-//                Email(
-//                    id = index.toString(),
-//                    subject = "Curso de Kotlin $index",
-//                    content = "Olá, tudo bem? Estamos aqui para te avisar que o curso de Android está com uma promoção imperdível. Corra e garanta já a sua vaga!",
-//                    time = currentTime,
-//                    color = backgroundProfileColors.random(),
-//                    user = User(
-//                        "Alura",
-//                        "https://www.alura.com.br/assets/img/alura-logo-white.1570550707.svg"
-//                    ),
-//                ),
-//            )
-//        }
-//
-//        return emails.sortedByDescending { it.time }
-//    }
-
+    fun getEmailById(id: String): Email? {
+        return listOfEmails.firstOrNull { it.id == id }
+    }
 }
 
 fun generateRandomDateInMillis(weeksAgo: Int): Long {

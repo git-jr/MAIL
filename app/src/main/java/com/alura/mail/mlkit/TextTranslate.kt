@@ -1,0 +1,283 @@
+package com.alura.mail.mlkit
+
+import android.util.Log
+import com.alura.mail.model.Language
+import com.google.mlkit.common.model.DownloadConditions
+import com.google.mlkit.common.model.RemoteModelManager
+import com.google.mlkit.nl.languageid.LanguageIdentification
+import com.google.mlkit.nl.languageid.LanguageIdentifier.UNDETERMINED_LANGUAGE_TAG
+import com.google.mlkit.nl.translate.TranslateRemoteModel
+import com.google.mlkit.nl.translate.Translation
+import com.google.mlkit.nl.translate.TranslatorOptions
+
+private const val LANGUAGE_TAG = "LanguageIdentification"
+private const val TRANSLATE_TAG = "Translate"
+
+class TextTranslate {
+    fun translateText(
+        text: String,
+        targetLanguage: String,
+        sourceLanguage: String,
+        onSuccessful: (String) -> Unit = {},
+        onFailure: () -> Unit = {},
+    ) {
+        val options = TranslatorOptions.Builder()
+            .setSourceLanguage(sourceLanguage)
+            .setTargetLanguage(targetLanguage)
+            .build()
+
+        val translator = Translation.getClient(options)
+
+        with(translator) {
+            verifyIfModelAreAvailable(
+                sourceLanguage = targetLanguage,
+                targetLanguage = sourceLanguage,
+                onMoldAvailable = {
+                    translate(text)
+                        .addOnSuccessListener { translatedText ->
+                            onSuccessful(translatedText)
+                        }
+                        .addOnFailureListener { exception ->
+                            Log.e(TRANSLATE_TAG, "Translation failed: $exception")
+                            onFailure()
+                        }
+                },
+                onModelNotAvailable = {
+                    downloadLanguageModel(
+                        sourceLanguage = targetLanguage,
+                        targetLanguage = sourceLanguage,
+                        onSuccessful = {
+                            translate(text)
+                                .addOnSuccessListener { translatedText ->
+                                    onSuccessful(translatedText)
+                                }
+                                .addOnFailureListener { exception ->
+                                    Log.e(TRANSLATE_TAG, "Translation failed: $exception")
+                                    onFailure()
+                                }
+                        },
+                        onFailure = {
+                            onFailure()
+                        }
+                    )
+                }
+            )
+
+        }
+
+    }
+
+    private fun verifyIfModelAreAvailable(
+        sourceLanguage: String,
+        targetLanguage: String,
+        onMoldAvailable: () -> Unit = {},
+        onModelNotAvailable: () -> Unit
+    ) {
+
+        val conditions = DownloadConditions.Builder()
+            .requireWifi()
+            .build()
+
+        val options = TranslatorOptions.Builder()
+            .setSourceLanguage(sourceLanguage)
+            .setTargetLanguage(targetLanguage)
+            .build()
+        val translator = Translation.getClient(options)
+
+        translator.downloadModelIfNeeded(conditions)
+            .addOnSuccessListener {
+                onMoldAvailable()
+            }
+            .addOnFailureListener { exception ->
+                onModelNotAvailable()
+                Log.e(TRANSLATE_TAG, "Model not avaliable: $exception")
+            }
+
+    }
+
+
+    private fun downloadLanguageModel(
+        sourceLanguage: String,
+        targetLanguage: String,
+        onSuccessful: () -> Unit = {},
+        onFailure: () -> Unit = {}
+    ) {
+        val modelManager = RemoteModelManager.getInstance()
+
+        val sourceModel = TranslateRemoteModel.Builder(sourceLanguage).build()
+        val targetModel = TranslateRemoteModel.Builder(targetLanguage).build()
+
+        val conditions = DownloadConditions.Builder()
+            .requireWifi()
+            .build()
+
+        modelManager.download(sourceModel, conditions)
+            .addOnSuccessListener {
+                modelManager.download(targetModel, conditions)
+                    .addOnSuccessListener {
+                        onSuccessful()
+                    }
+                    .addOnFailureListener {
+                        onFailure()
+                        Log.e(TRANSLATE_TAG, "Error downloading targetModel: $it")
+                    }
+            }
+            .addOnFailureListener {
+                onFailure()
+                Log.e(TRANSLATE_TAG, "Error downloading model: $it")
+            }
+    }
+
+    fun identifyLanguage(
+        text: String,
+        onSuccessful: (Language) -> Unit = {},
+        onFailure: () -> Unit = {}
+    ) {
+        val languageIdentifier = LanguageIdentification
+            .getClient()
+
+        languageIdentifier.identifyLanguage(text)
+            .addOnSuccessListener { languageCode ->
+                val languageName = codeNameLanguagesMap[languageCode]
+                if (languageCode == UNDETERMINED_LANGUAGE_TAG || languageName == null) {
+                    Log.i(LANGUAGE_TAG, "Can't identify language.")
+                    onFailure()
+                } else {
+                    onSuccessful(
+                        Language(languageName, languageCode)
+                    )
+                }
+            }
+            .addOnFailureListener {
+                onFailure()
+            }
+
+        languageIdentifier.identifyPossibleLanguages(text)
+            .addOnSuccessListener { identifiedLanguages ->
+                for (identifiedLanguage in identifiedLanguages) {
+                    val languageTag = identifiedLanguage.languageTag
+                    val languageName = codeNameLanguagesMap[languageTag]
+                    val confidence = (identifiedLanguage.confidence * 100).toInt()
+
+                    Log.i(
+                        LANGUAGE_TAG,
+                        "Detected language: $languageTag - $languageName - Probability: $confidence%"
+                    )
+                }
+            }
+    }
+}
+
+
+val codeNameLanguagesMap = mapOf(
+    "af" to "africâner",
+    "sou" to "amárico",
+    "ar" to "árabe",
+    "ar-latn" to "árabe",
+    "az" to "azerbaijano",
+    "ser" to "bielorrusso",
+    "bg" to "búlgaro",
+    "bg-latn" to "búlgaro",
+    "bn" to "bengali",
+    "bs" to "bósnio",
+    "ca" to "catalão",
+    "ceb" to "cebuano",
+    "co" to "córsico",
+    "cs" to "tcheco",
+    "cy" to "galês",
+    "da" to "dinamarquês",
+    "de" to "alemão",
+    "el" to "grego",
+    "el-latn" to "grego",
+    "en" to "inglês",
+    "eo" to "esperanto",
+    "es" to "espanhol",
+    "et" to "estoniano",
+    "eu" to "basco",
+    "fa" to "persa",
+    "fi" to "finlandês",
+    "fil" to "filipino",
+    "fr" to "francês",
+    "fy" to "frísio ocidental",
+    "ga" to "irlandês",
+    "gd" to "escocês gaélico",
+    "gl" to "galego",
+    "gu" to "gujarati",
+    "ha" to "hauçá",
+    "haw" to "havaiana",
+    "he" to "hebraico",
+    "hi" to "hindi",
+    "hi-latn" to "hindi",
+    "hnn" to "hmong",
+    "hr" to "croata",
+    "ht" to "haitiano",
+    "hu" to "húngaro",
+    "hy" to "armênio",
+    "id" to "indonésio",
+    "ig" to "igbo",
+    "is" to "islandês",
+    "it" to "italiano",
+    "ja" to "japonês",
+    "jat-latn" to "japonês",
+    "jv" to "javanês",
+    "ka" to "georgiano",
+    "kk" to "cazaque",
+    "km" to "khmer",
+    "kn" to "canarim",
+    "ko" to "coreano",
+    "ku" to "curdo",
+    "ky" to "quirguiz",
+    "la" to "latina",
+    "lb" to "luxemburguês",
+    "lo" to "laosiano",
+    "lt" to "lituano",
+    "lv" to "letão",
+    "mg" to "malgaxe",
+    "mi" to "maori",
+    "mk" to "macedônio",
+    "ml" to "malaiala",
+    "mn" to "mongol",
+    "mr" to "marata",
+    "ms" to "malaio",
+    "mt" to "maltês",
+    "my" to "birmanês",
+    "ne" to "nepalês",
+    "nl" to "holandês",
+    "no" to "norueguês",
+    "ny" to "nianja",
+    "pa" to "punjabi",
+    "pl" to "polonês",
+    "ps" to "pashto",
+    "pt" to "português",
+    "ro" to "romeno",
+    "ru" to "russo",
+    "ru-latn" to "russo",
+    "sd" to "sindi",
+    "si" to "cingalês",
+    "sk" to "eslovaco",
+    "sl" to "esloveno",
+    "sm" to "samoano",
+    "sn" to "chona",
+    "so" to "somali",
+    "sq" to "albanês",
+    "sr" to "sérvio",
+    "st" to "sesotho",
+    "su" to "sundanês",
+    "sv" to "sueco",
+    "sw" to "suaíli",
+    "ta" to "tâmil",
+    "te" to "télugo",
+    "tg" to "tajique",
+    "th" to "tailandês",
+    "tr" to "turco",
+    "uk" to "ucraniano",
+    "ur" to "urdu",
+    "uz" to "usbeque",
+    "vi" to "vietnamita",
+    "xh" to "xhosa",
+    "yi" to "ídiche",
+    "yo" to "iorubá",
+    "zh" to "chinês",
+    "zh-lattn" to "chinês",
+    "zu" to "zulu"
+)

@@ -3,7 +3,7 @@ package com.alura.mail.ui.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alura.mail.model.DownloadState
-import com.alura.mail.model.Language
+import com.alura.mail.model.LanguageModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,38 +19,38 @@ class TranslateSettingsViewModel : ViewModel() {
 
     private fun loadLanguages() {
 
-        val languages = listOf(
-            Language(
+        val languageModels = listOf(
+            LanguageModel(
                 id = 1,
                 name = "Português",
                 downloadState = DownloadState.DOWNLOADED,
                 size = "81 MB"
             ),
-            Language(
+            LanguageModel(
                 id = 2,
                 name = "Inglês",
                 downloadState = DownloadState.DOWNLOADED,
                 size = "82 MB"
             ),
-            Language(
+            LanguageModel(
                 id = 3,
                 name = "Espanhol",
                 downloadState = DownloadState.NOT_DOWNLOADED,
                 size = "83 MB"
             ),
-            Language(
+            LanguageModel(
                 id = 4,
                 name = "Francês",
                 downloadState = DownloadState.NOT_DOWNLOADED,
                 size = "78 MB"
             ),
-            Language(
+            LanguageModel(
                 id = 5,
                 name = "Alemão",
                 downloadState = DownloadState.DOWNLOADED,
                 size = "79 MB"
             ),
-            Language(
+            LanguageModel(
                 id = 6,
                 name = "Italiano",
                 downloadState = DownloadState.NOT_DOWNLOADED,
@@ -60,9 +60,9 @@ class TranslateSettingsViewModel : ViewModel() {
 
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(
-                languages = languages,
-                downloadedLanguages = languages.filter { it.downloadState == DownloadState.DOWNLOADED },
-                notDownloadedLanguages = languages.filter { it.downloadState == DownloadState.NOT_DOWNLOADED || it.downloadState == DownloadState.DOWNLOADING },
+                languageModels = languageModels,
+                downloadedLanguageModels = languageModels.filter { it.downloadState == DownloadState.DOWNLOADED },
+                notDownloadedLanguageModels = languageModels.filter { it.downloadState == DownloadState.NOT_DOWNLOADED || it.downloadState == DownloadState.DOWNLOADING },
             )
         }
     }
@@ -80,36 +80,36 @@ class TranslateSettingsViewModel : ViewModel() {
         )
     }
 
-    fun changeDownloadState(language: Language, downloadState: DownloadState) {
-        val languages = _uiState.value.languages.toMutableList()
-        val languageIndex = languages.indexOfFirst { it.id == language.id }
-        languages[languageIndex] = language.copy(downloadState = downloadState)
+    fun changeDownloadState(languageModel: LanguageModel, downloadState: DownloadState) {
+        val languages = _uiState.value.languageModels.toMutableList()
+        val languageIndex = languages.indexOfFirst { it.id == languageModel.id }
+        languages[languageIndex] = languageModel.copy(downloadState = downloadState)
 
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(
-                languages = languages,
-                downloadedLanguages = languages.filter { it.downloadState == DownloadState.DOWNLOADED },
-                notDownloadedLanguages = languages.filter { it.downloadState == DownloadState.NOT_DOWNLOADED || it.downloadState == DownloadState.DOWNLOADING },
+                languageModels = languages,
+                downloadedLanguageModels = languages.filter { it.downloadState == DownloadState.DOWNLOADED },
+                notDownloadedLanguageModels = languages.filter { it.downloadState == DownloadState.NOT_DOWNLOADED || it.downloadState == DownloadState.DOWNLOADING },
             )
         }
     }
 
-    fun selectedLanguage(language: Language) {
+    fun selectedLanguage(languageModel: LanguageModel) {
         _uiState.value = _uiState.value.copy(
-            selectedLanguage = language
+            selectedLanguageModel = languageModel
         )
     }
 
-    fun downloadLanguage(language: Language) {
+    fun downloadLanguage(languageModel: LanguageModel) {
         changeDownloadState(
-            language = language,
+            languageModel = languageModel,
             downloadState = DownloadState.DOWNLOADING
         )
 
         viewModelScope.launch {
             delay(2000)
             changeDownloadState(
-                language = language,
+                languageModel = languageModel,
                 downloadState = DownloadState.DOWNLOADED
             )
         }

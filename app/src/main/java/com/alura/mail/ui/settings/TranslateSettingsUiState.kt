@@ -1,13 +1,13 @@
 package com.alura.mail.ui.settings
 
-import com.alura.mail.model.Language
+import com.alura.mail.model.LanguageModel
 
 data class TranslateSettingsUiState(
-    val languages: List<Language> = emptyList(),
-    val downloadedLanguages: List<Language> = emptyList(),
-    val notDownloadedLanguages: List<Language> = emptyList(),
+    val languageModels: List<LanguageModel> = emptyList(),
+    val downloadedLanguageModels: List<LanguageModel> = emptyList(),
+    val notDownloadedLanguageModels: List<LanguageModel> = emptyList(),
     val showDownloadLanguageDialog: Boolean = false,
     val showDeleteLanguageDialog: Boolean = false,
-    val selectedLanguage: Language? = null,
+    val selectedLanguageModel: LanguageModel? = null,
 )
 

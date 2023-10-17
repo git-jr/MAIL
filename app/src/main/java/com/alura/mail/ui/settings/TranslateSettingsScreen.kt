@@ -30,7 +30,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.alura.mail.R
 import com.alura.mail.model.DownloadState
-import com.alura.mail.model.Language
+import com.alura.mail.model.LanguageModel
 
 @Composable
 fun TranslateSettingsScreen(modifier: Modifier = Modifier) {
@@ -52,12 +52,12 @@ fun TranslateSettingsScreen(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.size(8.dp))
 
         LazyColumn {
-            if (state.downloadedLanguages.isNotEmpty()) {
+            if (state.downloadedLanguageModels.isNotEmpty()) {
                 item {
                     SeparatorLanguageItem("Download concluído")
-                    state.downloadedLanguages.forEach { language ->
+                    state.downloadedLanguageModels.forEach { language ->
                         LanguageItem(
-                            language = language,
+                            languageModel = language,
                             onClick = {
                                 translateSettingsViewModel.selectedLanguage(language)
                                 translateSettingsViewModel.changeShowDeleteLanguageDialog(true)
@@ -67,12 +67,12 @@ fun TranslateSettingsScreen(modifier: Modifier = Modifier) {
                 }
             }
 
-            if (state.notDownloadedLanguages.isNotEmpty()) {
+            if (state.notDownloadedLanguageModels.isNotEmpty()) {
                 item {
                     SeparatorLanguageItem("Toque para fazer o download")
-                    state.notDownloadedLanguages.forEach { language ->
+                    state.notDownloadedLanguageModels.forEach { language ->
                         LanguageItem(
-                            language = language,
+                            languageModel = language,
                             onClick = {
                                 translateSettingsViewModel.selectedLanguage(language)
                                 translateSettingsViewModel.changeShowDownloadLanguageDialog(true)
@@ -84,8 +84,8 @@ fun TranslateSettingsScreen(modifier: Modifier = Modifier) {
         }
     }
 
-    if (state.showDownloadLanguageDialog && state.selectedLanguage != null) {
-        state.selectedLanguage?.let { selectedLanguage ->
+    if (state.showDownloadLanguageDialog && state.selectedLanguageModel != null) {
+        state.selectedLanguageModel?.let { selectedLanguage ->
             LanguageDialog(
                 title = "${selectedLanguage.name} (${selectedLanguage.size})",
                 description = "Para traduzir os e-mails recebidos para esse idioma mesmo sem conexão com a internet, faça o download do arquivo de tradução.",
@@ -95,12 +95,12 @@ fun TranslateSettingsScreen(modifier: Modifier = Modifier) {
                 },
                 onConfirm = {
                     translateSettingsViewModel.changeDownloadState(
-                        language = selectedLanguage,
+                        languageModel = selectedLanguage,
                         downloadState = DownloadState.DOWNLOADING
                     )
 
                     translateSettingsViewModel.downloadLanguage(
-                        language = selectedLanguage
+                        languageModel = selectedLanguage
                     )
                     translateSettingsViewModel.changeShowDownloadLanguageDialog(false)
                 }
@@ -109,8 +109,8 @@ fun TranslateSettingsScreen(modifier: Modifier = Modifier) {
     }
 
 
-    if (state.showDeleteLanguageDialog && state.selectedLanguage != null) {
-        state.selectedLanguage?.let { selectedLanguage ->
+    if (state.showDeleteLanguageDialog && state.selectedLanguageModel != null) {
+        state.selectedLanguageModel?.let { selectedLanguage ->
             LanguageDialog(
                 title = "${selectedLanguage.name} (${selectedLanguage.size})",
                 description = "Se você remover este arquivo de tradução, não poderá traduzir os e-mails recebidos para esse idioma até fazer o download novamente.",
@@ -120,7 +120,7 @@ fun TranslateSettingsScreen(modifier: Modifier = Modifier) {
                 },
                 onConfirm = {
                     translateSettingsViewModel.changeDownloadState(
-                        language = selectedLanguage,
+                        languageModel = selectedLanguage,
                         downloadState = DownloadState.NOT_DOWNLOADED
                     )
                     translateSettingsViewModel.changeShowDeleteLanguageDialog(false)
@@ -144,7 +144,7 @@ private fun SeparatorLanguageItem(title: String) {
 
 @Composable
 private fun LanguageItem(
-    language: Language,
+    languageModel: LanguageModel,
     onClick: () -> Unit = {},
 ) {
     Row(
@@ -156,13 +156,13 @@ private fun LanguageItem(
             .fillMaxWidth(),
     ) {
         Text(
-            text = language.name,
+            text = languageModel.name,
             fontSize = 18.sp,
         )
 
         Icon(
-            painter = painterResource(id = getIconByLanguage(language)),
-            contentDescription = getDescriptionByLanguage(language),
+            painter = painterResource(id = getIconByLanguage(languageModel)),
+            contentDescription = getDescriptionByLanguage(languageModel),
             tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f),
             modifier = Modifier.size(26.dp),
         )
@@ -244,14 +244,14 @@ fun LanguageDialog(
 }
 
 @Composable
-private fun getIconByLanguage(language: Language) = when (language.downloadState) {
+private fun getIconByLanguage(languageModel: LanguageModel) = when (languageModel.downloadState) {
     DownloadState.DOWNLOADED -> R.drawable.ic_delete
     DownloadState.DOWNLOADING -> R.drawable.ic_downloading
     DownloadState.NOT_DOWNLOADED -> R.drawable.ic_download
 }
 
 @Composable
-private fun getDescriptionByLanguage(language: Language) = when (language.downloadState) {
+private fun getDescriptionByLanguage(languageModel: LanguageModel) = when (languageModel.downloadState) {
     DownloadState.DOWNLOADED -> "Idioma baixado"
     DownloadState.DOWNLOADING -> "Baixando idioma"
     DownloadState.NOT_DOWNLOADED -> "Toque para fazer o download"
