@@ -1,6 +1,5 @@
 package com.alura.mail.ui.home
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -16,19 +15,19 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.alura.mail.ui.components.HomeAppBar
 import com.alura.mail.ui.components.HomeBottomBar
@@ -37,14 +36,11 @@ import com.alura.mail.ui.navigation.contentEmailScreen
 import com.alura.mail.ui.navigation.emailListRoute
 import com.alura.mail.ui.navigation.emailsListScreen
 import com.alura.mail.ui.navigation.navigateToContentEmailScreen
-import com.alura.mail.ui.navigation.navigateToEmailsListScreen
-import com.alura.mail.ui.navigation.navigateToTranslateSettingsScreen
 import com.alura.mail.ui.navigation.translateSettingsScreen
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-fun HomeScreen(
-    onBack: () -> Unit,
+fun HomeNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController()
 ) {
@@ -61,28 +57,28 @@ fun HomeScreen(
         }
     }
 
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
 
-    SetupOnBackPress(
-        showEmailList = showEmailsList,
-        onBack = onBack,
-        onChangeSelectedTab = {
-            homeViewModel.changeSelectedTab(it)
+    val currentDestination by remember {
+        derivedStateOf {
+            navBackStackEntry?.destination
         }
-    )
+    }
 
-    var selectedEmail: Email? by remember { mutableStateOf(null) }
+    val selectedEmail: Email? by remember { mutableStateOf(null) }
 
     Scaffold(
-        modifier = Modifier
-            .nestedScroll(scrollBehavior.nestedScrollConnection),
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            if (showEmailsList) {
+            if (currentDestination?.route == emailListRoute) {
                 HomeAppBar(scrollBehavior)
             } else {
                 DefaultAppBar(
-                    title = selectedEmail?.subject ?: "Configurações de idioma",
+                    title = selectedEmail?.subject ?: "Configurações de idioma5",
                     scrollBehavior = scrollBehavior,
-                    onBack = onBack
+                    onBack = {
+                        navController.navigateUp()
+                    }
                 )
             }
         },
@@ -93,9 +89,9 @@ fun HomeScreen(
         },
         bottomBar = {
             HomeBottomBar(
-                currentTab = state.selectedTab,
-                onItemSelected = { tab ->
-                    homeViewModel.changeSelectedTab(tab)
+                currentTab = currentDestination?.route ?: emailListRoute,
+                onItemSelected = { route ->
+                    navController.navigateDirect(route)
                 }
             )
         },
@@ -104,26 +100,6 @@ fun HomeScreen(
             modifier = Modifier
                 .padding(paddingValues)
         ) {
-
-            LaunchedEffect(state.selectedTab) {
-                when (state.selectedTab) {
-                    0 -> {
-                        navController.navigateToEmailsListScreen()
-
-                    }
-
-                    1 -> {
-                        navController.navigateToTranslateSettingsScreen()
-                    }
-
-                    2 -> {
-                        selectedEmail?.let {
-                            navController.navigateToContentEmailScreen(it.id.toString())
-                        }
-                    }
-                }
-            }
-
             NavHost(
                 navController = navController,
                 startDestination = emailListRoute,
@@ -135,61 +111,9 @@ fun HomeScreen(
                     },
                     listState = listState
                 )
-
                 contentEmailScreen()
-
-                translateSettingsScreen(
-//                    onBack = {
-//                        navController.navigateUp()
-//                    }
-                )
+                translateSettingsScreen()
             }
-
-            /**
-            Crossfade(targetState = state.selectedTab, label = "") { selectedTab ->
-
-            when (selectedTab) {
-            0 -> {
-            EmailsListScreen(
-            emails = state.emails,
-            onClick = {
-            selectedEmail = it
-            homeViewModel.changeSelectedTab(2)
-            },
-            listState = listState
-            )
-            }
-
-            1 -> {
-            TranslateSettingsScreen()
-            }
-
-            2 -> {
-            selectedEmail?.let {
-            ContentEmailScreen(
-            email = it,
-            textTranslateFor = "Traduzir do Inglês para Português"
-            )
-            }
-            }
-            }
-            }
-             **/
-        }
-    }
-}
-
-@Composable
-private fun SetupOnBackPress(
-    showEmailList: Boolean,
-    onChangeSelectedTab: (Int) -> Unit,
-    onBack: () -> Unit
-) {
-    BackHandler {
-        if (showEmailList) {
-            onBack()
-        } else {
-            onChangeSelectedTab(0)
         }
     }
 }
@@ -226,4 +150,12 @@ fun DefaultAppBar(
             containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
         ),
     )
+}
+
+fun NavHostController.navigateDirect(rota: String) = this.navigate(rota) {
+    popUpTo(this@navigateDirect.graph.findStartDestination().id) {
+        saveState = true
+    }
+    launchSingleTop = true
+    restoreState = true
 }

@@ -14,29 +14,32 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.alura.mail.ui.navigation.emailListRoute
+import com.alura.mail.ui.navigation.translateSettingsRoute
 
 
 @Composable
 fun HomeBottomBar(
     modifier: Modifier = Modifier,
-    currentTab: Int,
-    onItemSelected: (Int) -> Unit,
+    currentTab: String,
+    onItemSelected: (String) -> Unit,
 ) {
     Box(modifier = modifier) {
         NavigationBar(
             containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.6f),
         ) {
-            screenItems.forEachIndexed { index, item ->
+            screenItems.forEach { item ->
                 NavigationBarItem(
                     icon = {
                         Icon(
-                            if (currentTab == index) item.second.first else item.second.second,
-                            contentDescription = item.first,
+                            if (currentTab == item.route) item.resourceId.first else item.resourceId.second,
+                            contentDescription = item.title,
                         )
                     },
-                    label = { Text(item.first) },
-                    selected = currentTab == index,
-                    onClick = { onItemSelected(index) },
+                    label = { Text(item.title) },
+                    selected = currentTab == item.route,
+                    onClick = { onItemSelected(item.route) },
                     colors = NavigationBarItemDefaults.colors(
                         selectedIconColor = MaterialTheme.colorScheme.onSecondaryContainer,
                         unselectedIconColor = MaterialTheme.colorScheme.onSurface,
@@ -51,6 +54,26 @@ fun HomeBottomBar(
 }
 
 val screenItems = listOf(
-    Pair("Home", Pair(Icons.Filled.Home, Icons.Outlined.Home)),
-    Pair("Ajustes", Pair(Icons.Filled.Settings, Icons.Outlined.Settings)),
+    ScreenItem(
+        title = "Home",
+        route = emailListRoute,
+        resourceId = Pair(
+            Icons.Filled.Home,
+            Icons.Outlined.Home,
+        ),
+    ),
+    ScreenItem(
+        title = "Ajustes",
+        route = translateSettingsRoute,
+        resourceId = Pair(
+            Icons.Filled.Settings,
+            Icons.Outlined.Settings,
+        ),
+    ),
+)
+
+data class ScreenItem(
+    val title: String,
+    val route: String,
+    val resourceId: Pair<ImageVector, ImageVector>,
 )

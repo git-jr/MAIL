@@ -9,7 +9,6 @@ import com.alura.mail.ui.home.EmailsListScreen
 
 internal const val emailListRoute = "emailList"
 
-
 fun NavGraphBuilder.emailsListScreen(
     onOpenEmail: (String) -> Unit = {},
     onSendNewMessage: () -> Unit = {},
@@ -19,9 +18,6 @@ fun NavGraphBuilder.emailsListScreen(
         EmailsListScreen(
             onClick = {
                 onOpenEmail(it.id.toString())
-
-//                selectedEmail = it
-//                homeViewModel.changeSelectedTab(2)
             },
             listState = listState
         )

@@ -8,8 +8,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
-import com.alura.mail.ui.home.HomeScreen
-import com.alura.mail.ui.navigation.NavHost
+import com.alura.mail.ui.home.HomeNavHost
 import com.alura.mail.ui.theme.MAILTheme
 
 class MainActivity : ComponentActivity() {
@@ -22,12 +21,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
-                    HomeScreen(
-                        onBack = { finish() },
-                        navController = navController
-
-                    )
-                    NavHost(navController = navController)
+                    HomeNavHost(navController = navController)
                 }
             }
         }

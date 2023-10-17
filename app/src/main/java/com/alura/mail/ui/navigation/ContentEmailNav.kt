@@ -2,10 +2,10 @@ package com.alura.mail.ui.navigation
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
-import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import com.alura.mail.dao.EmailDao
 import com.alura.mail.ui.contentEmail.ContentEmailScreen
+import com.alura.mail.ui.home.navigateDirect
 
 internal const val contentEmailRoute = "emails"
 internal const val emailIdArgument = "emailId"
@@ -28,7 +28,7 @@ fun NavGraphBuilder.contentEmailScreen() {
 }
 
 internal fun NavHostController.navigateToContentEmailScreen(
-    emailId: String, navOptions: NavOptions? = null
+    emailId: String
 ) {
-    navigate("$contentEmailRoute/$emailId", navOptions)
+    navigateDirect("$contentEmailRoute/$emailId")
 }
