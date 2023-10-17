@@ -1,4 +1,4 @@
-package com.alura.mail.ui.contentEmail
+package com.alura.mail.ui.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

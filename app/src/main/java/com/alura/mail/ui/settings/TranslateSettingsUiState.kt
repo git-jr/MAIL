@@ -1,4 +1,4 @@
-package com.alura.mail.ui.contentEmail
+package com.alura.mail.ui.settings
 
 import com.alura.mail.model.Language
 

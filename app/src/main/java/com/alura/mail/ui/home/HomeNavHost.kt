@@ -1,5 +1,9 @@
 package com.alura.mail.ui.home
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -19,6 +23,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
@@ -107,6 +112,14 @@ fun HomeNavHost(
                 navController = navController,
                 startDestination = emailListRoute,
                 modifier = modifier,
+                enterTransition = {
+                    expandVertically(
+                        expandFrom = Alignment.CenterVertically,
+                        animationSpec = tween(200)
+                    ) + fadeIn(animationSpec = tween(250))
+                },
+                popEnterTransition = { fadeIn(animationSpec = tween(200)) },
+                popExitTransition = { fadeOut(animationSpec = tween(200)) },
             ) {
                 emailsListScreen(
                     onOpenEmail = { email ->
@@ -121,7 +134,6 @@ fun HomeNavHost(
         }
     }
 }
-
 
 @ExperimentalMaterial3Api
 @Composable

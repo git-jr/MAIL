@@ -31,7 +31,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.alura.mail.R
 import com.alura.mail.model.DownloadState
 import com.alura.mail.model.Language
-import com.alura.mail.ui.contentEmail.TranslateSettingsViewModel
 
 @Composable
 fun TranslateSettingsScreen(modifier: Modifier = Modifier) {
