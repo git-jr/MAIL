@@ -1,5 +1,7 @@
 package com.alura.mail.ui.contentEmail
 
+import com.alura.mail.model.Language
+
 data class TranslateSettingsUiState(
     val languages: List<Language> = emptyList(),
     val downloadedLanguages: List<Language> = emptyList(),
@@ -9,15 +11,3 @@ data class TranslateSettingsUiState(
     val selectedLanguage: Language? = null,
 )
 
-data class Language(
-    val id: Int,
-    val name: String,
-    val downloadState: DownloadState,
-    val size: String
-)
-
-enum class DownloadState {
-    DOWNLOADED,
-    DOWNLOADING,
-    NOT_DOWNLOADED,
-}

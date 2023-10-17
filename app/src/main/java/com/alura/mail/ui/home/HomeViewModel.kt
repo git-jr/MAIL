@@ -3,10 +3,11 @@ package com.alura.mail.ui.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alura.mail.dao.EmailDao
+import com.alura.mail.model.Email
+import com.alura.mail.ui.navigation.emailListRoute
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-
 
 class HomeViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(
@@ -24,10 +25,15 @@ class HomeViewModel : ViewModel() {
         }
     }
 
-    fun changeSelectedTab(indexTab: Int) {
+    fun changeCurrentDestination(route: String) {
         _uiState.value = _uiState.value.copy(
-            showEmailsList = indexTab == 0,
-            selectedTab = indexTab
+            showEmailsList = route == emailListRoute
+        )
+    }
+
+    fun setSelectedEmail(email: Email) {
+        _uiState.value = _uiState.value.copy(
+            selectedEmail = email
         )
     }
 }

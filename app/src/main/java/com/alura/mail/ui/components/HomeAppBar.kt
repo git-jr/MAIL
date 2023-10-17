@@ -1,5 +1,6 @@
 package com.alura.mail.ui.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -24,8 +25,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
+import com.alura.mail.R
 
 @ExperimentalMaterial3Api
 @Composable
@@ -70,13 +72,21 @@ fun HomeAppBar(scrollBehavior: TopAppBarScrollBehavior) {
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Spacer(modifier = Modifier.width(16.dp))
-                    AsyncImage(
-                        "https://pbs.twimg.com/profile_images/1597421774676828165/m-BUQtop_400x400.jpg",
+                    Image(
+                        painterResource(id = R.drawable.profile_pic),
                         contentDescription = "imagem de perfil",
                         modifier = Modifier
                             .clip(CircleShape)
                             .size(32.dp)
                     )
+
+//                    AsyncImage(
+//                        "https://pbs.twimg.com/profile_images/1597421774676828165/m-BUQtop_400x400.jpg",
+//                        contentDescription = "imagem de perfil",
+//                        modifier = Modifier
+//                            .clip(CircleShape)
+//                            .size(32.dp)
+//                    )
 
                     Spacer(modifier = Modifier.width(16.dp))
                 }

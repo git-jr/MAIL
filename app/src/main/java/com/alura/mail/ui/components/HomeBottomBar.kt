@@ -14,7 +14,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
+import com.alura.mail.model.ScreenItem
 import com.alura.mail.ui.navigation.emailListRoute
 import com.alura.mail.ui.navigation.translateSettingsRoute
 
@@ -53,7 +53,7 @@ fun HomeBottomBar(
     }
 }
 
-val screenItems = listOf(
+private val screenItems = listOf(
     ScreenItem(
         title = "Home",
         route = emailListRoute,
@@ -70,10 +70,4 @@ val screenItems = listOf(
             Icons.Outlined.Settings,
         ),
     ),
-)
-
-data class ScreenItem(
-    val title: String,
-    val route: String,
-    val resourceId: Pair<ImageVector, ImageVector>,
 )

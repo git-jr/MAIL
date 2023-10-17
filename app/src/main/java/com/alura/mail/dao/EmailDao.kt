@@ -1,7 +1,7 @@
 package com.alura.mail.dao
 
-import com.alura.mail.ui.home.Email
-import com.alura.mail.ui.home.User
+import com.alura.mail.model.Email
+import com.alura.mail.model.User
 import com.alura.mail.ui.theme.backgroundProfileColors
 import kotlinx.datetime.Clock
 
@@ -15,7 +15,7 @@ class EmailDao {
             val currentTime = generateRandomDateInMillis(1)
             emails.add(
                 Email(
-                    id = index,
+                    id = index.toString(),
                     subject = "Curso de Kotlin $index",
                     content = "Olá, tudo bem? \n\nEstamos aqui para te avisar que o curso de Android está com uma promoção imperdível. \nCorra e garanta já a sua vaga! \n\n",
                     time = currentTime,
@@ -34,7 +34,7 @@ class EmailDao {
             val currentTime = generateRandomDateInMillis(52)
             emails.add(
                 Email(
-                    id = index,
+                    id = index.toString(),
                     subject = "Curso de Kotlin $index",
                     content = "Olá, tudo bem? Estamos aqui para te avisar que o curso de Android está com uma promoção imperdível. Corra e garanta já a sua vaga!",
                     time = currentTime,
@@ -53,7 +53,7 @@ class EmailDao {
             val currentTime = generateRandomDateInMillis(104)
             emails.add(
                 Email(
-                    id = index,
+                    id = index.toString(),
                     subject = "Curso de Kotlin $index",
                     content = "Olá, tudo bem? Estamos aqui para te avisar que o curso de Android está com uma promoção imperdível. Corra e garanta já a sua vaga!",
                     time = currentTime,

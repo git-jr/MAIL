@@ -37,8 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.alura.mail.R
 import com.alura.mail.extensions.toFormattedDate
-import com.alura.mail.ui.home.Email
-
+import com.alura.mail.model.Email
 
 @Composable
 fun ContentEmailScreen(

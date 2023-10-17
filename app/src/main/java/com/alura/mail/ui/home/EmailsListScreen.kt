@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.alura.mail.dao.EmailDao
 import com.alura.mail.extensions.toFormattedDate
+import com.alura.mail.model.Email
 
 
 @Composable

@@ -22,9 +22,7 @@ fun NavGraphBuilder.contentEmailScreen() {
                 textTranslateFor = "Traduzir do Inglês para Português",
             )
         }
-
     }
-
 }
 
 internal fun NavHostController.navigateToContentEmailScreen(

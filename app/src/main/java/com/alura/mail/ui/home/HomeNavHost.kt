@@ -18,10 +18,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -29,9 +29,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.alura.mail.R
 import com.alura.mail.ui.components.HomeAppBar
 import com.alura.mail.ui.components.HomeBottomBar
 import com.alura.mail.ui.components.HomeFAB
+import com.alura.mail.ui.navigation.contentEmailFullPath
 import com.alura.mail.ui.navigation.contentEmailScreen
 import com.alura.mail.ui.navigation.emailListRoute
 import com.alura.mail.ui.navigation.emailsListScreen
@@ -46,35 +48,34 @@ fun HomeNavHost(
 ) {
     val homeViewModel = viewModel<HomeViewModel>()
     val state by homeViewModel.uiState.collectAsState()
-    val showEmailsList = state.showEmailsList
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val listState = rememberLazyListState()
 
     val expandedFab by remember {
-        derivedStateOf {
-            listState.isScrollInProgress.not()
-        }
+        derivedStateOf { listState.isScrollInProgress.not() }
     }
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
 
     val currentDestination by remember {
         derivedStateOf {
+            homeViewModel.changeCurrentDestination(
+                navBackStackEntry?.destination?.route ?: emailListRoute
+            )
             navBackStackEntry?.destination
         }
     }
 
-    val selectedEmail: Email? by remember { mutableStateOf(null) }
-
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            if (currentDestination?.route == emailListRoute) {
+            if (state.showEmailsList) {
                 HomeAppBar(scrollBehavior)
             } else {
                 DefaultAppBar(
-                    title = selectedEmail?.subject ?: "Configurações de idioma5",
+                    title = state.selectedEmail?.subject
+                        ?: stringResource(id = R.string.language_settings),
                     scrollBehavior = scrollBehavior,
                     onBack = {
                         navController.navigateUp()
@@ -83,17 +84,19 @@ fun HomeNavHost(
             }
         },
         floatingActionButton = {
-            if (showEmailsList) {
+            if (state.showEmailsList) {
                 HomeFAB(expanded = expandedFab)
             }
         },
         bottomBar = {
-            HomeBottomBar(
-                currentTab = currentDestination?.route ?: emailListRoute,
-                onItemSelected = { route ->
-                    navController.navigateDirect(route)
-                }
-            )
+            if (currentDestination?.route != contentEmailFullPath) {
+                HomeBottomBar(
+                    currentTab = currentDestination?.route ?: emailListRoute,
+                    onItemSelected = { route ->
+                        navController.navigateDirect(route)
+                    }
+                )
+            }
         },
     ) { paddingValues ->
         Column(
@@ -106,10 +109,11 @@ fun HomeNavHost(
                 modifier = modifier,
             ) {
                 emailsListScreen(
-                    onOpenEmail = { emailId ->
-                        navController.navigateToContentEmailScreen(emailId)
+                    onOpenEmail = { email ->
+                        navController.navigateToContentEmailScreen(email.id)
+                        homeViewModel.setSelectedEmail(email)
                     },
-                    listState = listState
+                    listState = listState,
                 )
                 contentEmailScreen()
                 translateSettingsScreen()
@@ -147,7 +151,7 @@ fun DefaultAppBar(
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
+            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f),
         ),
     )
 }

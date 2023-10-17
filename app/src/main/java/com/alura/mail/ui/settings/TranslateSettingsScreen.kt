@@ -29,8 +29,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.alura.mail.R
-import com.alura.mail.ui.contentEmail.DownloadState
-import com.alura.mail.ui.contentEmail.Language
+import com.alura.mail.model.DownloadState
+import com.alura.mail.model.Language
 import com.alura.mail.ui.contentEmail.TranslateSettingsViewModel
 
 @Composable
@@ -175,9 +175,9 @@ private fun LanguageItem(
 fun LanguageDialog(
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
-    title: String = "Francês (81M)",
-    description: String = "Ao fazer o download de um idioma, você pode traduzir os e-mails recebidos para esse idioma mesmo sem conexão com a internet.",
-    confirmText: String = "Baixar",
+    title: String,
+    description: String,
+    confirmText: String,
 ) {
     Dialog(
         onDismissRequest = { onDismiss() }
