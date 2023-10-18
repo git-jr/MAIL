@@ -251,8 +251,9 @@ private fun getIconByLanguage(languageModel: LanguageModel) = when (languageMode
 }
 
 @Composable
-private fun getDescriptionByLanguage(languageModel: LanguageModel) = when (languageModel.downloadState) {
-    DownloadState.DOWNLOADED -> "Idioma baixado"
-    DownloadState.DOWNLOADING -> "Baixando idioma"
-    DownloadState.NOT_DOWNLOADED -> "Toque para fazer o download"
-}
+private fun getDescriptionByLanguage(languageModel: LanguageModel) =
+    when (languageModel.downloadState) {
+        DownloadState.DOWNLOADED -> "Idioma baixado"
+        DownloadState.DOWNLOADING -> "Baixando idioma"
+        DownloadState.NOT_DOWNLOADED -> "Toque para fazer o download"
+    }

@@ -23,10 +23,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,34 +33,58 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.alura.mail.R
 import com.alura.mail.extensions.toFormattedDate
 import com.alura.mail.model.Email
+import com.alura.mail.ui.components.LoadScreen
+import com.alura.mail.ui.settings.LanguageDialog
 
 @Composable
-fun ContentEmailScreen(state: ContentEmailUiState) {
-    val email = state.selectedEmail ?: return
-    val textTranslateFor =
-        "Traduzir do ${state.languageIdentified?.name} para ${state.localLanguage?.name}"
+fun ContentEmailScreen() {
+    val viewModel = viewModel<ContentEmailViewModel>()
+    val state by viewModel.uiState.collectAsState()
 
-    Column(
-        Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
-    ) {
-        var alreadyTranslated by remember {
-            mutableStateOf(false)
-        }
+    state.selectedEmail?.let { email ->
+        val textTranslateFor =
+            "Traduzir do ${state.languageIdentified?.name} para ${state.localLanguage?.name}"
 
-        EmailHeader(email)
-        if (state.needTranslate) {
-            EmailSubHeader(
-                textTranslateFor = textTranslateFor,
-                alreadyTranslated = state.alreadyTranslated,
-                onClick = { alreadyTranslated = !alreadyTranslated }
+        if (state.showDownloadLanguageDialog) {
+            // mostrar dialog
+            LanguageDialog(
+                title = "${state.languageIdentified?.name}",
+                description = "Para traduzir os e-mails recebidos para esse idioma mesmo sem conexão com a internet, faça o download do arquivo de tradução.",
+                confirmText = "Download",
+                onConfirm = {
+                    viewModel.changeShowDownloadLanguageDialog(false)
+                    viewModel.downloadLanguageModel()
+                },
+                onDismiss = {
+                    viewModel.changeShowDownloadLanguageDialog(false)
+                },
             )
         }
-        EmailContent(email)
+
+        Column(
+            Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
+        ) {
+            EmailHeader(email)
+            if (state.needTranslate) {
+                EmailSubHeader(
+                    textTranslateFor = textTranslateFor,
+                    alreadyTranslated = state.alreadyTranslated,
+                    onClick = {
+                        viewModel.tryTranslateEmail()
+                    }
+                )
+            }
+            EmailContent(email)
+        }
+
+    } ?: run {
+        LoadScreen()
     }
 }
 

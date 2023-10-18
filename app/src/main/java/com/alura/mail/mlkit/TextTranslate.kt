@@ -6,14 +6,69 @@ import com.google.mlkit.common.model.DownloadConditions
 import com.google.mlkit.common.model.RemoteModelManager
 import com.google.mlkit.nl.languageid.LanguageIdentification
 import com.google.mlkit.nl.languageid.LanguageIdentifier.UNDETERMINED_LANGUAGE_TAG
+import com.google.mlkit.nl.translate.TranslateLanguage
 import com.google.mlkit.nl.translate.TranslateRemoteModel
 import com.google.mlkit.nl.translate.Translation
 import com.google.mlkit.nl.translate.TranslatorOptions
 
 private const val LANGUAGE_TAG = "LanguageIdentification"
-private const val TRANSLATE_TAG = "Translate"
+private const val TRANSLATE_TAG = "TranslateTag"
+const val DOWNLOAD_TAG = "DownloadTag"
 
 class TextTranslate {
+    fun modelHasBeenDownloaded(
+        targetLanguage: String,
+        onSuccessful: () -> Unit = {},
+        onFailure: () -> Unit = {}
+    ) {
+        val modelManager = RemoteModelManager.getInstance()
+
+        // Get translation models stored on the device.
+        modelManager.getDownloadedModels(TranslateRemoteModel::class.java)
+            .addOnSuccessListener { models ->
+                Log.e(DOWNLOAD_TAG, "modelos baixados: ${models.map { it.language }}")
+
+                if (models.any { it.language == targetLanguage }) {
+                    onSuccessful()
+                } else {
+                    onFailure()
+                }
+            }
+            .addOnFailureListener {
+                Log.e(DOWNLOAD_TAG, "Error getting downloaded models: $it")
+            }
+
+    }
+
+    fun downloadModel(
+        targetLanguage: String,
+        onSuccessful: () -> Unit = {},
+        onFailure: () -> Unit = {}
+    ) {
+        val modelManager = RemoteModelManager.getInstance()
+
+        val remoteModel = TranslateRemoteModel
+            .Builder(
+                TranslateLanguage.fromLanguageTag(targetLanguage).toString(),
+            )
+            .build()
+
+
+        val conditions = DownloadConditions.Builder()
+            .requireWifi()
+            .build()
+        modelManager.download(remoteModel, conditions)
+            .addOnSuccessListener {
+                Log.i(DOWNLOAD_TAG, "Model downloaded.")
+                onSuccessful()
+            }
+            .addOnFailureListener {
+                Log.e(DOWNLOAD_TAG, "Error downloading model: $it")
+                onFailure()
+            }
+    }
+
+
     fun translateText(
         text: String,
         targetLanguage: String,
@@ -29,51 +84,28 @@ class TextTranslate {
         val translator = Translation.getClient(options)
 
         with(translator) {
-            verifyIfModelAreAvailable(
-                sourceLanguage = targetLanguage,
-                targetLanguage = sourceLanguage,
-                onMoldAvailable = {
-                    translate(text)
-                        .addOnSuccessListener { translatedText ->
-                            onSuccessful(translatedText)
-                        }
-                        .addOnFailureListener { exception ->
-                            Log.e(TRANSLATE_TAG, "Translation failed: $exception")
-                            onFailure()
-                        }
-                },
-                onModelNotAvailable = {
-                    downloadLanguageModel(
-                        sourceLanguage = targetLanguage,
-                        targetLanguage = sourceLanguage,
-                        onSuccessful = {
-                            translate(text)
-                                .addOnSuccessListener { translatedText ->
-                                    onSuccessful(translatedText)
-                                }
-                                .addOnFailureListener { exception ->
-                                    Log.e(TRANSLATE_TAG, "Translation failed: $exception")
-                                    onFailure()
-                                }
-                        },
-                        onFailure = {
-                            onFailure()
-                        }
-                    )
+            translate(text)
+                .addOnSuccessListener { translatedText ->
+                    Log.e(TRANSLATE_TAG, "Idioma original: $sourceLanguage")
+                    Log.e(TRANSLATE_TAG, "Idioma traduzido: $targetLanguage")
+                    Log.e(TRANSLATE_TAG, "Traslation success: $translatedText")
+                    onSuccessful(translatedText)
                 }
-            )
-
+                .addOnFailureListener { exception ->
+                    Log.e(TRANSLATE_TAG, "Translation failed: $exception")
+                    onFailure()
+                }
         }
 
     }
 
-    private fun verifyIfModelAreAvailable(
+
+    fun verifyIfModelAreAvailableAndDownloadAutomatically(
         sourceLanguage: String,
         targetLanguage: String,
-        onMoldAvailable: () -> Unit = {},
+        onModelAvailable: () -> Unit = {},
         onModelNotAvailable: () -> Unit
     ) {
-
         val conditions = DownloadConditions.Builder()
             .requireWifi()
             .build()
@@ -84,19 +116,32 @@ class TextTranslate {
             .build()
         val translator = Translation.getClient(options)
 
-        translator.downloadModelIfNeeded(conditions)
-            .addOnSuccessListener {
-                onMoldAvailable()
-            }
-            .addOnFailureListener { exception ->
-                onModelNotAvailable()
-                Log.e(TRANSLATE_TAG, "Model not avaliable: $exception")
-            }
 
+        translator.use {
+            it.downloadModelIfNeeded(conditions)
+                .addOnSuccessListener {
+                    Log.e(TRANSLATE_TAG, "Model avaliable!")
+                    onModelAvailable()
+                }
+                .addOnFailureListener { exception ->
+                    Log.e(TRANSLATE_TAG, "Model not avaliable: $exception")
+                    onModelNotAvailable()
+                }
+        }
+
+//        translator.downloadModelIfNeeded(conditions)
+//            .addOnSuccessListener {
+//                Log.e(TRANSLATE_TAG, "Model avaliable!")
+//                onModelAvailable()
+//            }
+//            .addOnFailureListener { exception ->
+//                Log.e(TRANSLATE_TAG, "Model not avaliable: $exception")
+//                onModelNotAvailable()
+//            }
     }
 
 
-    private fun downloadLanguageModel(
+    private fun downloadLanguageModelOld(
         sourceLanguage: String,
         targetLanguage: String,
         onSuccessful: () -> Unit = {},
@@ -106,6 +151,7 @@ class TextTranslate {
 
         val sourceModel = TranslateRemoteModel.Builder(sourceLanguage).build()
         val targetModel = TranslateRemoteModel.Builder(targetLanguage).build()
+        targetModel.language
 
         val conditions = DownloadConditions.Builder()
             .requireWifi()
@@ -165,6 +211,60 @@ class TextTranslate {
                     )
                 }
             }
+    }
+
+
+    fun translateTextOld(
+        text: String,
+        targetLanguage: String,
+        sourceLanguage: String,
+        onSuccessful: (String) -> Unit = {},
+        onFailure: () -> Unit = {},
+    ) {
+        val options = TranslatorOptions.Builder()
+            .setSourceLanguage(sourceLanguage)
+            .setTargetLanguage(targetLanguage)
+            .build()
+
+        val translator = Translation.getClient(options)
+
+        with(translator) {
+            verifyIfModelAreAvailableAndDownloadAutomatically(
+                sourceLanguage = targetLanguage,
+                targetLanguage = sourceLanguage,
+                onModelAvailable = {
+                    translate(text)
+                        .addOnSuccessListener { translatedText ->
+                            onSuccessful(translatedText)
+                        }
+                        .addOnFailureListener { exception ->
+                            Log.e(TRANSLATE_TAG, "Translation failed: $exception")
+                            onFailure()
+                        }
+                },
+                onModelNotAvailable = {
+                    downloadLanguageModelOld(
+                        sourceLanguage = targetLanguage,
+                        targetLanguage = sourceLanguage,
+                        onSuccessful = {
+                            translate(text)
+                                .addOnSuccessListener { translatedText ->
+                                    onSuccessful(translatedText)
+                                }
+                                .addOnFailureListener { exception ->
+                                    Log.e(TRANSLATE_TAG, "Translation failed: $exception")
+                                    onFailure()
+                                }
+                        },
+                        onFailure = {
+                            onFailure()
+                        }
+                    )
+                }
+            )
+
+        }
+
     }
 }
 

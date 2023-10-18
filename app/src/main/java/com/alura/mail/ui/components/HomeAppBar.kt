@@ -28,6 +28,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.alura.mail.R
+import com.alura.mail.extensions.toFormattedDate
 
 @ExperimentalMaterial3Api
 @Composable
@@ -63,8 +64,9 @@ fun HomeAppBar(scrollBehavior: TopAppBarScrollBehavior) {
                     )
                     Spacer(modifier = Modifier.width(16.dp))
                 }
+
                 Text(
-                    text = "Pesquisar no e-mail",
+                    text = "Pesquisar no e-mail ${System.currentTimeMillis().toFormattedDate()}",
                     color = MaterialTheme.colorScheme.onSurface,
                 )
                 Row(
@@ -79,14 +81,6 @@ fun HomeAppBar(scrollBehavior: TopAppBarScrollBehavior) {
                             .clip(CircleShape)
                             .size(32.dp)
                     )
-
-//                    AsyncImage(
-//                        "https://pbs.twimg.com/profile_images/1597421774676828165/m-BUQtop_400x400.jpg",
-//                        contentDescription = "imagem de perfil",
-//                        modifier = Modifier
-//                            .clip(CircleShape)
-//                            .size(32.dp)
-//                    )
 
                     Spacer(modifier = Modifier.width(16.dp))
                 }
