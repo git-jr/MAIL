@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.alura.mail.ui.settings
 
 import androidx.compose.foundation.background
@@ -12,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -23,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -31,9 +35,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.alura.mail.R
 import com.alura.mail.model.DownloadState
 import com.alura.mail.model.LanguageModel
+import com.alura.mail.ui.home.DefaultAppBar
 
 @Composable
-fun TranslateSettingsScreen(modifier: Modifier = Modifier) {
+fun TranslateSettingsScreen(
+    modifier: Modifier = Modifier,
+    onBackClick: () -> Unit = {}
+) {
     val translateSettingsViewModel = viewModel<TranslateSettingsViewModel>()
     val state by translateSettingsViewModel.uiState.collectAsState()
 
@@ -43,6 +51,11 @@ fun TranslateSettingsScreen(modifier: Modifier = Modifier) {
             .fillMaxSize()
             .padding(vertical = 16.dp),
     ) {
+        DefaultAppBar(
+            title = stringResource(id = R.string.language_settings),
+            onBack = { onBackClick() }
+        )
+
         Text(
             text = "Ao fazer o download de um idioma, você pode traduzir os e-mails recebidos para esse idioma mesmo sem conexão com a internet.",
             fontSize = MaterialTheme.typography.bodyMedium.fontSize,

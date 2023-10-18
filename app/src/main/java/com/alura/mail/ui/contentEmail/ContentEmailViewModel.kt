@@ -33,7 +33,8 @@ class ContentEmailViewModel(
             val email = emailDao.getEmailById(emailId)
             _uiState.value = _uiState.value.copy(
                 selectedEmail = email,
-                originalContent = email?.content
+                originalContent = email?.content,
+                originalSubject = email?.subject
             )
             identifyEmailLanguage()
             identifyLocalLanguage()
@@ -99,14 +100,17 @@ class ContentEmailViewModel(
     }
 
     fun tryTranslateEmail() {
+        setTranslateState(TranslatedState.TRANSLATING)
+
         // se já foi traduzido volta ao original
-        if (_uiState.value.alreadyTranslated) {
+        if (_uiState.value.translatedState == TranslatedState.TRANSLATED) {
             _uiState.value.selectedEmail?.let { email ->
                 _uiState.value = _uiState.value.copy(
                     selectedEmail = email.copy(
-                        content = _uiState.value.originalContent.toString()
+                        content = _uiState.value.originalContent.toString(),
+                        subject = _uiState.value.originalSubject.toString()
                     ),
-                    alreadyTranslated = false
+                    translatedState = TranslatedState.NOT_TRANSLATED
                 )
             }
         } else {
@@ -127,6 +131,12 @@ class ContentEmailViewModel(
         }
     }
 
+    fun setTranslateState(state: TranslatedState) {
+        _uiState.value = _uiState.value.copy(
+            translatedState = state
+        )
+    }
+
     private fun translateEmail() {
         _uiState.value.selectedEmail?.let { email ->
             _uiState.value.languageIdentified?.let { languageIdentified ->
@@ -140,7 +150,7 @@ class ContentEmailViewModel(
                                 selectedEmail = email.copy(
                                     content = translatedText
                                 ),
-                                alreadyTranslated = true
+                                translatedState = TranslatedState.TRANSLATED
                             )
                             translateSubject()
                         }

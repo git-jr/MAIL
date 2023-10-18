@@ -10,9 +10,9 @@ internal const val contentEmailRoute = "emails"
 internal const val emailIdArgument = "emailId"
 internal const val contentEmailFullPath = "$contentEmailRoute/{$emailIdArgument}"
 
-fun NavGraphBuilder.contentEmailScreen() {
+fun NavGraphBuilder.contentEmailScreen(navController: NavHostController) {
     composable(contentEmailFullPath) {
-        ContentEmailScreen()
+        ContentEmailScreen(onBackClick = { navController.popBackStack() })
     }
 }
 

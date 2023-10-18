@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.alura.mail.ui.contentEmail
 
 import androidx.compose.foundation.background
@@ -18,8 +20,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,10 +42,11 @@ import com.alura.mail.R
 import com.alura.mail.extensions.toFormattedDate
 import com.alura.mail.model.Email
 import com.alura.mail.ui.components.LoadScreen
+import com.alura.mail.ui.home.DefaultAppBar
 import com.alura.mail.ui.settings.LanguageDialog
 
 @Composable
-fun ContentEmailScreen() {
+fun ContentEmailScreen(onBackClick: () -> Unit = {}) {
     val viewModel = viewModel<ContentEmailViewModel>()
     val state by viewModel.uiState.collectAsState()
 
@@ -49,8 +54,28 @@ fun ContentEmailScreen() {
         val textTranslateFor =
             "Traduzir do ${state.languageIdentified?.name} para ${state.localLanguage?.name}"
 
+        Column(
+            Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
+        ) {
+            DefaultAppBar(
+                title = email.subject,
+                onBack = { onBackClick() }
+            )
+            EmailHeader(email)
+            if (state.needTranslate) {
+                EmailSubHeader(
+                    textTranslateFor = textTranslateFor,
+                    translatedState = state.translatedState
+                ) {
+                    viewModel.tryTranslateEmail()
+                }
+            }
+            EmailContent(email)
+        }
+
         if (state.showDownloadLanguageDialog) {
-            // mostrar dialog
             LanguageDialog(
                 title = "${state.languageIdentified?.name}",
                 description = "Para traduzir os e-mails recebidos para esse idioma mesmo sem conexão com a internet, faça o download do arquivo de tradução.",
@@ -61,28 +86,10 @@ fun ContentEmailScreen() {
                 },
                 onDismiss = {
                     viewModel.changeShowDownloadLanguageDialog(false)
+                    viewModel.setTranslateState(TranslatedState.NOT_TRANSLATED)
                 },
             )
         }
-
-        Column(
-            Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState()),
-        ) {
-            EmailHeader(email)
-            if (state.needTranslate) {
-                EmailSubHeader(
-                    textTranslateFor = textTranslateFor,
-                    alreadyTranslated = state.alreadyTranslated,
-                    onClick = {
-                        viewModel.tryTranslateEmail()
-                    }
-                )
-            }
-            EmailContent(email)
-        }
-
     } ?: run {
         LoadScreen()
     }
@@ -91,7 +98,7 @@ fun ContentEmailScreen() {
 @Composable
 private fun EmailSubHeader(
     textTranslateFor: String,
-    alreadyTranslated: Boolean,
+    translatedState: TranslatedState,
     onClick: () -> Unit = {}
 ) {
     Spacer(modifier = Modifier.height(8.dp))
@@ -121,10 +128,10 @@ private fun EmailSubHeader(
                 Text(
                     text = textTranslateFor,
                     fontSize = MaterialTheme.typography.titleSmall.fontSize,
-                    color = if (alreadyTranslated) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.inverseOnSurface,
-                    fontWeight = if (alreadyTranslated) FontWeight.Normal else FontWeight.Bold
+                    color = if (translatedState == TranslatedState.TRANSLATED) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.inverseOnSurface,
+                    fontWeight = if (translatedState == TranslatedState.TRANSLATED) FontWeight.Normal else FontWeight.Bold
                 )
-                if (alreadyTranslated) {
+                if (translatedState == TranslatedState.TRANSLATED) {
                     Text(
                         text = "Mostrar original",
                         fontSize = MaterialTheme.typography.labelMedium.fontSize,
@@ -146,6 +153,12 @@ private fun EmailSubHeader(
                 modifier = Modifier.size(24.dp)
             )
         }
+    }
+
+    if (translatedState == TranslatedState.TRANSLATING) {
+        LinearProgressIndicator(
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
 }
 
@@ -218,7 +231,7 @@ private fun EmailHeader(email: Email) {
 @Composable
 fun EmailContent(email: Email) {
     Text(
-        text = email.content + email.content,
+        text = email.content,
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 32.dp),
     )
 }

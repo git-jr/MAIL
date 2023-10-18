@@ -28,7 +28,7 @@ val listOfEmails = listOf(
     Email(
         id = "1",
         subject = "Um novo curso de Android com IA",
-        content = "Olá, tudo bem? \n\nEstamos aqui para te avisar que o curso de Android está com uma promoção imperdível. \nCorra e garanta já a sua vaga! \n\n",
+        content = "Olá, tudo bem? Estamos aqui para te avisar que o curso de Android está com uma promoção imperdível. Corra e garanta já a sua vaga! ",
         time = generateRandomDateInMillis(1),
         color = 0xFFFE8966,
         user = User(
@@ -39,7 +39,7 @@ val listOfEmails = listOf(
     Email(
         id = "2",
         subject = "Un nouveau cours Android avec IA",
-        content = "Salut, comment ça va ? \n\nNous sommes là pour vous informer que le cours Android est en promotion. \nDépêchez-vous et réservez votre place dès maintenant ! \n\n",
+        content = "Salut, comment ça va ? Nous sommes là pour vous informer que le cours Android est en promotion. Dépêchez-vous et réservez votre place dès maintenant ! ",
         time = 1619382000000L,
         color = 0xFF5F96F5,
         user = User(
@@ -50,7 +50,7 @@ val listOfEmails = listOf(
     Email(
         id = "3",
         subject = "Урок Android с ИИ",
-        content = "Привет, как дела? \n\nМы здесь, чтобы сообщить вам, что урок Android по специальной цене. \nПоторопитесь и забронируйте свое место! \n\n",
+        content = "Привет, как дела? Мы здесь, чтобы сообщить вам, что урок Android по специальной цене. Поторопитесь и забронируйте свое место! ",
         time = 1642086000000L,
         color = 0xFFF55FEE,
         user = User(
@@ -61,7 +61,7 @@ val listOfEmails = listOf(
     Email(
         id = "4",
         subject = "Ein neuer Android-Kurs mit KI",
-        content = "Hallo, wie geht es dir? \n\nWir möchten dich darüber informieren, dass der Android-Kurs im Angebot ist. \nSchnapp dir deinen Platz jetzt! \n\n",
+        content = "Hallo, wie geht es dir? Wir möchten dich darüber informieren, dass der Android-Kurs im Angebot ist. Schnapp dir deinen Platz jetzt! ",
         time = 1633206000000L,
         color = 0xFF9B5FF5,
         user = User(
@@ -72,7 +72,7 @@ val listOfEmails = listOf(
     Email(
         id = "5",
         subject = "Un nouveau cours Android avec IA",
-        content = "Salut, comment ça va ? \n\nNous sommes là pour vous informer que le cours Android est en promotion. \nDépêchez-vous et réservez votre place dès maintenant ! \n\n",
+        content = "Salut, comment ça va ? Nous sommes là pour vous informer que le cours Android est en promotion. Dépêchez-vous et réservez votre place dès maintenant ! ",
         time = 1606863600000L,
         color = 0xFFF55F5F,
         user = User(
@@ -94,7 +94,7 @@ val listOfEmails = listOf(
     Email(
         id = "7",
         subject = "Νέο μάθημα Android με ΤΝ",
-        content = "Γειά σας, πώς είστε; \n\nΘέλουμε να σας ενημερώσουμε ότι το μάθημα Android είναι σε προσφορά. \nΚλείστε τη θέση σας τώρα! \n\n",
+        content = "Γειά σας, πώς είστε; Θέλουμε να σας ενημερώσουμε ότι το μάθημα Android είναι σε προσφορά. Κλείστε τη θέση σας τώρα! ",
         time = 1628238000000L,
         color = 0xFFDAA844,
         user = User(
@@ -105,7 +105,7 @@ val listOfEmails = listOf(
     Email(
         id = "8",
         subject = "Un nuevo curso de Android con IA",
-        content = "¡Hola! ¿Cómo estás? \n\nEstamos aquí para informarte que el curso de Android tiene una promoción. \n¡Date prisa y asegura tu lugar ya! \n\n",
+        content = "¡Hola! ¿Cómo estás? Estamos aquí para informarte que el curso de Android tiene una promoción. ¡Date prisa y asegura tu lugar ya! ",
         time = 1608591600000L,
         color = 0xFF5FF5A3,
         user = User(
@@ -160,7 +160,7 @@ val listOfEmails = listOf(
     Email(
         id = "13",
         subject = "Un nuevo curso de Android con IA",
-        content = "¡Hola! ¿Cómo estás? \n\nEstamos aquí para informarte que el curso de Android tiene una promoción. \n¡Date prisa y asegura tu lugar ya! \n\n",
+        content = "¡Hola! ¿Cómo estás? Estamos aquí para informarte que el curso de Android tiene una promoción. ¡Date prisa y asegura tu lugar ya! ",
         time = 1616151600000L,
         color = 0xFF5FD4F5,
         user = User(

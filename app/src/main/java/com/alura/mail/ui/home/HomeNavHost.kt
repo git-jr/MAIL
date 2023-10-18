@@ -1,7 +1,6 @@
 package com.alura.mail.ui.home
 
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Column
@@ -23,10 +22,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -34,7 +31,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.alura.mail.R
 import com.alura.mail.ui.components.HomeAppBar
 import com.alura.mail.ui.components.HomeBottomBar
 import com.alura.mail.ui.components.HomeFAB
@@ -77,15 +73,6 @@ fun HomeNavHost(
         topBar = {
             if (state.showEmailsList) {
                 HomeAppBar(scrollBehavior)
-            } else {
-                DefaultAppBar(
-                    title = state.selectedEmail?.subject
-                        ?: stringResource(id = R.string.language_settings),
-                    scrollBehavior = scrollBehavior,
-                    onBack = {
-                        navController.navigateUp()
-                    }
-                )
             }
         },
         floatingActionButton = {
@@ -112,12 +99,8 @@ fun HomeNavHost(
                 navController = navController,
                 startDestination = emailListRoute,
                 modifier = modifier,
-                enterTransition = {
-                    expandVertically(
-                        expandFrom = Alignment.CenterVertically,
-                        animationSpec = tween(200)
-                    ) + fadeIn(animationSpec = tween(250))
-                },
+                enterTransition = { fadeIn(animationSpec = tween(200)) },
+                exitTransition = { fadeOut(animationSpec = tween(200)) },
                 popEnterTransition = { fadeIn(animationSpec = tween(200)) },
                 popExitTransition = { fadeOut(animationSpec = tween(200)) },
             ) {
@@ -128,8 +111,8 @@ fun HomeNavHost(
                     },
                     listState = listState,
                 )
-                contentEmailScreen()
-                translateSettingsScreen()
+                contentEmailScreen(navController = navController)
+                translateSettingsScreen(navController = navController)
             }
         }
     }
@@ -139,7 +122,7 @@ fun HomeNavHost(
 @Composable
 fun DefaultAppBar(
     title: String,
-    scrollBehavior: TopAppBarScrollBehavior,
+    scrollBehavior: TopAppBarScrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(),
     onBack: () -> Unit
 ) {
     TopAppBar(
