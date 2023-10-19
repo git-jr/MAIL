@@ -39,6 +39,7 @@ import com.alura.mail.ui.navigation.contentEmailScreen
 import com.alura.mail.ui.navigation.emailListRoute
 import com.alura.mail.ui.navigation.emailsListScreen
 import com.alura.mail.ui.navigation.navigateToContentEmailScreen
+import com.alura.mail.ui.navigation.translateSettingsRoute
 import com.alura.mail.ui.navigation.translateSettingsScreen
 
 @Composable
@@ -97,7 +98,8 @@ fun HomeNavHost(
         ) {
             NavHost(
                 navController = navController,
-                startDestination = emailListRoute,
+//                startDestination = emailListRoute,
+                startDestination = translateSettingsRoute,
                 modifier = modifier,
                 enterTransition = { fadeIn(animationSpec = tween(200)) },
                 exitTransition = { fadeOut(animationSpec = tween(200)) },

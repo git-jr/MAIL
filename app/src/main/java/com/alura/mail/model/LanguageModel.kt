@@ -1,7 +1,7 @@
 package com.alura.mail.model
 
 data class LanguageModel(
-    val id: Int,
+    val id: String,
     val name: String,
     val downloadState: DownloadState,
     val size: String

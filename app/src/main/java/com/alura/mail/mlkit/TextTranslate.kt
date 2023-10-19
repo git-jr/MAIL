@@ -1,7 +1,10 @@
 package com.alura.mail.mlkit
 
+import android.content.Context
 import android.util.Log
+import com.alura.mail.model.DownloadState
 import com.alura.mail.model.Language
+import com.alura.mail.model.LanguageModel
 import com.google.mlkit.common.model.DownloadConditions
 import com.google.mlkit.common.model.RemoteModelManager
 import com.google.mlkit.nl.languageid.LanguageIdentification
@@ -10,20 +13,20 @@ import com.google.mlkit.nl.translate.TranslateLanguage
 import com.google.mlkit.nl.translate.TranslateRemoteModel
 import com.google.mlkit.nl.translate.Translation
 import com.google.mlkit.nl.translate.TranslatorOptions
+import java.io.File
 
 private const val LANGUAGE_TAG = "LanguageIdentification"
 private const val TRANSLATE_TAG = "TranslateTag"
 const val DOWNLOAD_TAG = "DownloadTag"
 
 class TextTranslate {
-    fun modelHasBeenDownloaded(
+    fun verifyModelDownloaded(
         targetLanguage: String,
         onSuccessful: () -> Unit = {},
         onFailure: () -> Unit = {}
     ) {
         val modelManager = RemoteModelManager.getInstance()
 
-        // Get translation models stored on the device.
         modelManager.getDownloadedModels(TranslateRemoteModel::class.java)
             .addOnSuccessListener { models ->
                 Log.e(DOWNLOAD_TAG, "modelos baixados: ${models.map { it.language }}")
@@ -36,6 +39,7 @@ class TextTranslate {
             }
             .addOnFailureListener {
                 Log.e(DOWNLOAD_TAG, "Error getting downloaded models: $it")
+                onFailure()
             }
 
     }
@@ -99,6 +103,42 @@ class TextTranslate {
 
     }
 
+
+    fun getDownloadedModels(
+        context: Context,
+        onSuccessful: (List<LanguageModel>) -> Unit = {},
+        onFailure: () -> Unit = {}
+    ) {
+        val modelManager = RemoteModelManager.getInstance()
+
+        modelManager.getDownloadedModels(TranslateRemoteModel::class.java)
+            .addOnSuccessListener { models: MutableSet<TranslateRemoteModel> ->
+
+                models.forEach { model ->
+                    Log.e(DOWNLOAD_TAG, "model: $model")
+                    Log.e(DOWNLOAD_TAG, "Name: ${model.modelName.toString()}")
+                    Log.e(DOWNLOAD_TAG, "NameForBackend: ${model.modelNameForBackend}")
+                    Log.e(DOWNLOAD_TAG, "Size: ${getSizeModel(context, model.modelNameForBackend)}")
+                }
+
+
+                val languageModels = models.map {
+                    LanguageModel(
+                        id = it.uniqueModelNameForPersist,
+                        name = it.language,
+                        downloadState = DownloadState.DOWNLOADED,
+                        size = getSizeModel(context, it.modelNameForBackend)
+                    )
+                }
+
+                onSuccessful(languageModels)
+            }
+            .addOnFailureListener {
+                Log.e(DOWNLOAD_TAG, "Error getting downloaded models: $it")
+                onFailure()
+            }
+
+    }
 
     fun verifyIfModelAreAvailableAndDownloadAutomatically(
         sourceLanguage: String,
@@ -268,6 +308,39 @@ class TextTranslate {
     }
 }
 
+fun getSizeModel(context: Context, modelName: String): String {
+    val modelFile =
+        File(context.filesDir.parent, "no_backup/com.google.mlkit.translate.models/$modelName")
+
+    return if (modelFile.exists()) {
+        formatBytesToMB(getFolderSize(modelFile))
+    } else {
+        "0 MB"
+    }
+}
+
+// Função para obter o tamanho de uma pasta recursivamente
+private fun getFolderSize(folder: File): Long {
+    var size: Long = 0
+
+    if (folder.exists()) {
+        val files = folder.listFiles()
+        if (files != null) {
+            for (file in files) {
+                if (file.isFile) {
+                    size += file.length()
+                } else if (file.isDirectory) {
+                    size += getFolderSize(file)
+                }
+            }
+        }
+    }
+    return size
+}
+
+fun formatBytesToMB(bytes: Long): String {
+    return "${bytes / 1024 / 1024} MB"
+}
 
 val codeNameLanguagesMap = mapOf(
     "af" to "africâner",
@@ -381,3 +454,5 @@ val codeNameLanguagesMap = mapOf(
     "zh-lattn" to "chinês",
     "zu" to "zulu"
 )
+
+

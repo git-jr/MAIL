@@ -8,6 +8,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 class TranslateSettingsViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(TranslateSettingsUiState())
@@ -18,55 +19,46 @@ class TranslateSettingsViewModel : ViewModel() {
     }
 
     private fun loadLanguages() {
-
         val languageModels = listOf(
             LanguageModel(
-                id = 1,
+                id = UUID.randomUUID().toString(),
                 name = "Português",
                 downloadState = DownloadState.DOWNLOADED,
                 size = "81 MB"
             ),
             LanguageModel(
-                id = 2,
+                id = UUID.randomUUID().toString(),
                 name = "Inglês",
                 downloadState = DownloadState.DOWNLOADED,
                 size = "82 MB"
             ),
             LanguageModel(
-                id = 3,
+                id = UUID.randomUUID().toString(),
                 name = "Espanhol",
                 downloadState = DownloadState.NOT_DOWNLOADED,
                 size = "83 MB"
             ),
             LanguageModel(
-                id = 4,
+                id = UUID.randomUUID().toString(),
                 name = "Francês",
                 downloadState = DownloadState.NOT_DOWNLOADED,
                 size = "78 MB"
             ),
             LanguageModel(
-                id = 5,
+                id = UUID.randomUUID().toString(),
                 name = "Alemão",
                 downloadState = DownloadState.DOWNLOADED,
                 size = "79 MB"
             ),
             LanguageModel(
-                id = 6,
+                id = UUID.randomUUID().toString(),
                 name = "Italiano",
                 downloadState = DownloadState.NOT_DOWNLOADED,
                 size = "56 MB"
             ),
         )
-
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(
-                languageModels = languageModels,
-                downloadedLanguageModels = languageModels.filter { it.downloadState == DownloadState.DOWNLOADED },
-                notDownloadedLanguageModels = languageModels.filter { it.downloadState == DownloadState.NOT_DOWNLOADED || it.downloadState == DownloadState.DOWNLOADING },
-            )
-        }
+        updateLanguages(languageModels)
     }
-
 
     fun changeShowDownloadLanguageDialog(show: Boolean) {
         _uiState.value = _uiState.value.copy(
@@ -85,11 +77,15 @@ class TranslateSettingsViewModel : ViewModel() {
         val languageIndex = languages.indexOfFirst { it.id == languageModel.id }
         languages[languageIndex] = languageModel.copy(downloadState = downloadState)
 
+        updateLanguages(languages)
+    }
+
+    private fun updateLanguages(languageModels: List<LanguageModel>) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(
-                languageModels = languages,
-                downloadedLanguageModels = languages.filter { it.downloadState == DownloadState.DOWNLOADED },
-                notDownloadedLanguageModels = languages.filter { it.downloadState == DownloadState.NOT_DOWNLOADED || it.downloadState == DownloadState.DOWNLOADING },
+                languageModels = languageModels,
+                downloadedLanguageModels = languageModels.filter { it.downloadState == DownloadState.DOWNLOADED },
+                notDownloadedLanguageModels = languageModels.filter { it.downloadState == DownloadState.NOT_DOWNLOADED || it.downloadState == DownloadState.DOWNLOADING },
             )
         }
     }
@@ -113,6 +109,51 @@ class TranslateSettingsViewModel : ViewModel() {
                 downloadState = DownloadState.DOWNLOADED
             )
         }
+    }
+
+
+    private fun loadLanguagesOld() {
+
+        val languageModels = listOf(
+            LanguageModel(
+                id = UUID.randomUUID().toString(),
+                name = "Português",
+                downloadState = DownloadState.DOWNLOADED,
+                size = "81 MB"
+            ),
+            LanguageModel(
+                id = UUID.randomUUID().toString(),
+                name = "Inglês",
+                downloadState = DownloadState.DOWNLOADED,
+                size = "82 MB"
+            ),
+            LanguageModel(
+                id = UUID.randomUUID().toString(),
+                name = "Espanhol",
+                downloadState = DownloadState.NOT_DOWNLOADED,
+                size = "83 MB"
+            ),
+            LanguageModel(
+                id = UUID.randomUUID().toString(),
+                name = "Francês",
+                downloadState = DownloadState.NOT_DOWNLOADED,
+                size = "78 MB"
+            ),
+            LanguageModel(
+                id = UUID.randomUUID().toString(),
+                name = "Alemão",
+                downloadState = DownloadState.DOWNLOADED,
+                size = "79 MB"
+            ),
+            LanguageModel(
+                id = UUID.randomUUID().toString(),
+                name = "Italiano",
+                downloadState = DownloadState.NOT_DOWNLOADED,
+                size = "56 MB"
+            ),
+        )
+
+        updateLanguages(languageModels)
     }
 
 }

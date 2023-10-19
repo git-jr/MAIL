@@ -8,6 +8,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
+import com.alura.mail.mlkit.TextTranslate
 import com.alura.mail.ui.home.HomeNavHost
 import com.alura.mail.ui.theme.MAILTheme
 
@@ -22,6 +23,8 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val navController = rememberNavController()
                     HomeNavHost(navController = navController)
+
+                    TextTranslate().getDownloadedModels(this)
                 }
             }
         }

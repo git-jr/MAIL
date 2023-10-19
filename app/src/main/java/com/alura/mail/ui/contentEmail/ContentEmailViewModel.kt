@@ -115,7 +115,7 @@ class ContentEmailViewModel(
             }
         } else {
             val languageIdentified = _uiState.value.languageIdentified?.code ?: return
-            TextTranslate().modelHasBeenDownloaded(
+            TextTranslate().verifyModelDownloaded(
                 languageIdentified,
                 onSuccessful = {
                     Log.i(DOWNLOAD_TAG, "Modelo NECESSÁRIO já sponivel!!!!")
