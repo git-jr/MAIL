@@ -34,11 +34,11 @@ import androidx.navigation.compose.rememberNavController
 import com.alura.mail.ui.components.HomeAppBar
 import com.alura.mail.ui.components.HomeBottomBar
 import com.alura.mail.ui.components.HomeFAB
-import com.alura.mail.ui.navigation.contentEmailFullPath
 import com.alura.mail.ui.navigation.contentEmailScreen
 import com.alura.mail.ui.navigation.emailListRoute
 import com.alura.mail.ui.navigation.emailsListScreen
 import com.alura.mail.ui.navigation.navigateToContentEmailScreen
+import com.alura.mail.ui.navigation.translateSettingsRoute
 import com.alura.mail.ui.navigation.translateSettingsScreen
 
 @Composable
@@ -81,14 +81,14 @@ fun HomeNavHost(
             }
         },
         bottomBar = {
-            if (currentDestination?.route != contentEmailFullPath) {
-                HomeBottomBar(
-                    currentTab = currentDestination?.route ?: emailListRoute,
-                    onItemSelected = { route ->
-                        navController.navigateDirect(route)
-                    }
-                )
-            }
+//            if (currentDestination?.route != contentEmailFullPath) {
+            HomeBottomBar(
+                currentTab = currentDestination?.route ?: emailListRoute,
+                onItemSelected = { route ->
+                    navController.navigateDirect(route)
+                }
+            )
+//            }
         },
     ) { paddingValues ->
         Column(
@@ -98,6 +98,7 @@ fun HomeNavHost(
             NavHost(
                 navController = navController,
                 startDestination = emailListRoute,
+//                startDestination = translateSettingsRoute,
                 modifier = modifier,
                 enterTransition = { fadeIn(animationSpec = tween(200)) },
                 exitTransition = { fadeOut(animationSpec = tween(200)) },

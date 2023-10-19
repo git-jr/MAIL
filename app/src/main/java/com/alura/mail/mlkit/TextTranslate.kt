@@ -48,27 +48,54 @@ class TextTranslate(private val fileUtil: FileUtil) {
         onSuccessful: () -> Unit = {},
         onFailure: () -> Unit = {}
     ) {
-        val modelManager = RemoteModelManager.getInstance()
+        TranslateLanguage.fromLanguageTag(targetLanguage)?.let { language ->
+            val modelManager = RemoteModelManager.getInstance()
 
-        val remoteModel = TranslateRemoteModel
-            .Builder(
-                TranslateLanguage.fromLanguageTag(targetLanguage).toString(),
-            )
-            .build()
+            val remoteModel = TranslateRemoteModel
+                .Builder(language)
+                .build()
 
+            val conditions = DownloadConditions.Builder()
+                .requireWifi()
+                .build()
 
-        val conditions = DownloadConditions.Builder()
-            .requireWifi()
-            .build()
-        modelManager.download(remoteModel, conditions)
-            .addOnSuccessListener {
-                Log.i(DOWNLOAD_TAG, "Model downloaded.")
-                onSuccessful()
-            }
-            .addOnFailureListener {
-                Log.e(DOWNLOAD_TAG, "Error downloading model: $it")
-                onFailure()
-            }
+            modelManager.download(remoteModel, conditions)
+                .addOnSuccessListener {
+                    Log.i(DOWNLOAD_TAG, "Model downloaded.")
+                    onSuccessful()
+                }
+                .addOnFailureListener {
+                    Log.e(DOWNLOAD_TAG, "Error downloading model: $it")
+                    onFailure()
+                }
+        } ?: run {
+            onFailure()
+        }
+    }
+
+    fun removeModel(
+        targetLanguage: String,
+        onSuccessful: () -> Unit = {},
+        onFailure: () -> Unit = {}
+    ) {
+        TranslateLanguage.fromLanguageTag(targetLanguage)?.let { language ->
+            val modelManager = RemoteModelManager.getInstance()
+            val remoteModel = TranslateRemoteModel
+                .Builder(language)
+                .build()
+
+            modelManager.deleteDownloadedModel(remoteModel)
+                .addOnSuccessListener {
+                    Log.i(DOWNLOAD_TAG, "Model removed.")
+                    onSuccessful()
+                }
+                .addOnFailureListener {
+                    Log.e(DOWNLOAD_TAG, "Error removing model: $it")
+                    onFailure()
+                }
+        } ?: run {
+            onFailure()
+        }
     }
 
 

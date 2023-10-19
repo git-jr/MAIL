@@ -92,7 +92,7 @@ fun TranslateSettingsScreen(
                                     languageModel = language,
                                     onClick = {
                                         translateSettingsViewModel.selectedLanguage(language)
-                                        translateSettingsViewModel.changeShowDeleteLanguageDialog(
+                                        translateSettingsViewModel.showDeleteDialog(
                                             true
                                         )
                                     }
@@ -109,9 +109,7 @@ fun TranslateSettingsScreen(
                                     languageModel = language,
                                     onClick = {
                                         translateSettingsViewModel.selectedLanguage(language)
-                                        translateSettingsViewModel.changeShowDownloadLanguageDialog(
-                                            true
-                                        )
+                                        translateSettingsViewModel.showDownloadDialog(true)
                                     }
                                 )
                             }
@@ -123,22 +121,15 @@ fun TranslateSettingsScreen(
             if (state.showDownloadLanguageDialog && state.selectedLanguageModel != null) {
                 state.selectedLanguageModel?.let { selectedLanguage ->
                     LanguageDialog(
-                        title = "${selectedLanguage.name} (${selectedLanguage.size})",
+                        title = selectedLanguage.name,
                         description = "Para traduzir os e-mails recebidos para esse idioma mesmo sem conexão com a internet, faça o download do arquivo de tradução.",
                         confirmText = "Download",
                         onDismiss = {
-                            translateSettingsViewModel.changeShowDownloadLanguageDialog(false)
+                            translateSettingsViewModel.showDownloadDialog(false)
                         },
                         onConfirm = {
-                            translateSettingsViewModel.changeDownloadState(
-                                languageModel = selectedLanguage,
-                                downloadState = DownloadState.DOWNLOADING
-                            )
-
-                            translateSettingsViewModel.downloadLanguage(
-                                languageModel = selectedLanguage
-                            )
-                            translateSettingsViewModel.changeShowDownloadLanguageDialog(false)
+                            translateSettingsViewModel.downloadLanguage(selectedLanguage)
+                            translateSettingsViewModel.showDownloadDialog(false)
                         }
                     )
                 }
@@ -152,14 +143,11 @@ fun TranslateSettingsScreen(
                         description = "Se você remover este arquivo de tradução, não poderá traduzir os e-mails recebidos para esse idioma até fazer o download novamente.",
                         confirmText = "Remover",
                         onDismiss = {
-                            translateSettingsViewModel.changeShowDeleteLanguageDialog(false)
+                            translateSettingsViewModel.showDeleteDialog(false)
                         },
                         onConfirm = {
-                            translateSettingsViewModel.changeDownloadState(
-                                languageModel = selectedLanguage,
-                                downloadState = DownloadState.NOT_DOWNLOADED
-                            )
-                            translateSettingsViewModel.changeShowDeleteLanguageDialog(false)
+                            translateSettingsViewModel.removeLanguage(selectedLanguage)
+                            translateSettingsViewModel.showDeleteDialog(false)
                         }
                     )
                 }

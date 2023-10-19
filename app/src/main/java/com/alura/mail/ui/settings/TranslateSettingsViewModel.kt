@@ -1,15 +1,12 @@
 package com.alura.mail.ui.settings
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.alura.mail.mlkit.TextTranslate
 import com.alura.mail.model.DownloadState
 import com.alura.mail.model.LanguageModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import java.util.UUID
 import javax.inject.Inject
 
@@ -35,7 +32,6 @@ class TranslateSettingsViewModel @Inject constructor(
         )
         // carregar os idiomas baixados e de lá já faz a filtragem
         loadDownloadedLanguages()
-
     }
 
     private fun filterAllModelNotDownloaded(downloadedModels: List<LanguageModel>): List<LanguageModel> {
@@ -62,24 +58,26 @@ class TranslateSettingsViewModel @Inject constructor(
         )
     }
 
-    fun changeShowDownloadLanguageDialog(show: Boolean) {
+    fun showDownloadDialog(show: Boolean) {
         _uiState.value = _uiState.value.copy(
             showDownloadLanguageDialog = show
         )
     }
 
-    fun changeShowDeleteLanguageDialog(show: Boolean) {
+    fun showDeleteDialog(show: Boolean) {
         _uiState.value = _uiState.value.copy(
             showDeleteLanguageDialog = show
         )
     }
 
-    fun changeDownloadState(languageModel: LanguageModel, downloadState: DownloadState) {
-        val languages = _uiState.value.allLanguageModels.toMutableList()
+    private fun updateDownloadState(languageModel: LanguageModel, downloadState: DownloadState) {
+        val languages = _uiState.value.notDownloadedLanguageModels.toMutableList()
         val languageIndex = languages.indexOfFirst { it.id == languageModel.id }
         languages[languageIndex] = languageModel.copy(downloadState = downloadState)
 
-        updateLanguages(languages)
+        _uiState.value = _uiState.value.copy(
+            notDownloadedLanguageModels = languages
+        )
     }
 
     private fun updateLanguages(languageModels: List<LanguageModel>) {
@@ -99,20 +97,35 @@ class TranslateSettingsViewModel @Inject constructor(
     }
 
     fun downloadLanguage(languageModel: LanguageModel) {
-        changeDownloadState(
+        updateDownloadState(
             languageModel = languageModel,
             downloadState = DownloadState.DOWNLOADING
         )
 
-        viewModelScope.launch {
-            delay(2000)
-            changeDownloadState(
-                languageModel = languageModel,
-                downloadState = DownloadState.DOWNLOADED
-            )
-        }
+        textTranslate.downloadModel(
+            targetLanguage = languageModel.id,
+            onSuccessful = {
+                loadLanguages()
+            },
+            onFailure = {
+                updateDownloadState(
+                    languageModel = languageModel,
+                    downloadState = DownloadState.NOT_DOWNLOADED
+                )
+            }
+        )
     }
 
+    fun removeLanguage(languageModel: LanguageModel) {
+        textTranslate.removeModel(
+            targetLanguage = languageModel.id,
+            onSuccessful = {
+                loadLanguages()
+            },
+            onFailure = {
+            }
+        )
+    }
 
     private fun loadLanguagesOld() {
 
