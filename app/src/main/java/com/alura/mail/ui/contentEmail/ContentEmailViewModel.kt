@@ -9,12 +9,17 @@ import com.alura.mail.mlkit.DOWNLOAD_TAG
 import com.alura.mail.mlkit.TextTranslate
 import com.alura.mail.model.Language
 import com.alura.mail.ui.navigation.emailIdArgument
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.Locale
+import javax.inject.Inject
 
-class ContentEmailViewModel(
+@HiltViewModel
+class ContentEmailViewModel @Inject constructor(
+    private val textTranslate: TextTranslate,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val emailDao = EmailDao()
@@ -43,7 +48,7 @@ class ContentEmailViewModel(
 
     private fun identifyEmailLanguage() {
         _uiState.value.selectedEmail?.let { email ->
-            TextTranslate().identifyLanguage(
+            textTranslate.identifyLanguage(
                 email.content,
                 onSuccessful = { language ->
                     _uiState.value = _uiState.value.copy(
@@ -75,7 +80,7 @@ class ContentEmailViewModel(
         // Podemos chamar esse metodo direto aqui sem a necessidade de verificar se o idioma já foi baixado ou não
         // porque o metodo automaticamente só baixa o modelo se ele ainda não estiver baixado
         // motrar até o teste com a internet desligada nesse ponto
-        TextTranslate().downloadModel(
+        textTranslate.downloadModel(
             languageCode,
             onSuccessful = {
                 Log.i(DOWNLOAD_TAG, "Modelo baixado com sucesso")
@@ -115,7 +120,7 @@ class ContentEmailViewModel(
             }
         } else {
             val languageIdentified = _uiState.value.languageIdentified?.code ?: return
-            TextTranslate().verifyModelDownloaded(
+            textTranslate.verifyModelDownloaded(
                 languageIdentified,
                 onSuccessful = {
                     Log.i(DOWNLOAD_TAG, "Modelo NECESSÁRIO já sponivel!!!!")
@@ -141,7 +146,7 @@ class ContentEmailViewModel(
         _uiState.value.selectedEmail?.let { email ->
             _uiState.value.languageIdentified?.let { languageIdentified ->
                 _uiState.value.localLanguage?.let { localLanguage ->
-                    TextTranslate().translateText(
+                    textTranslate.translateText(
                         email.content,
                         targetLanguage = localLanguage.code,
                         sourceLanguage = languageIdentified.code,
@@ -164,7 +169,7 @@ class ContentEmailViewModel(
         _uiState.value.selectedEmail?.let { email ->
             _uiState.value.languageIdentified?.let { languageIdentified ->
                 _uiState.value.localLanguage?.let { localLanguage ->
-                    TextTranslate().translateText(
+                    textTranslate.translateText(
                         email.subject,
                         targetLanguage = localLanguage.code,
                         sourceLanguage = languageIdentified.code,
@@ -185,7 +190,7 @@ class ContentEmailViewModel(
         val languageIdentified = _uiState.value.languageIdentified?.code ?: return
 
         Log.i(DOWNLOAD_TAG, "Tentando baixar o modelo para o idioma $languageIdentified")
-        TextTranslate().downloadModel(
+        textTranslate.downloadModel(
             languageIdentified,
             onSuccessful = {
                 Log.i(DOWNLOAD_TAG, "Modelo baixado com sucesso")

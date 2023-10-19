@@ -2,6 +2,8 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
 }
 
 android {
@@ -76,5 +78,10 @@ dependencies {
 
     implementation(libs.mlkit.language)
     implementation(libs.mlkit.translate)
+
+    implementation(libs.hilt.android)
+    implementation(libs.hilt.navigation.compose)
+    ksp (libs.dagger.compiler)
+    ksp (libs.hilt.compiler)
 
 }

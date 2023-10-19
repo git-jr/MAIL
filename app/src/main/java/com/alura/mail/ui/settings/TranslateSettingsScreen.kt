@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -28,13 +29,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.alura.mail.R
 import com.alura.mail.model.DownloadState
 import com.alura.mail.model.LanguageModel
+import com.alura.mail.ui.components.LoadScreen
 import com.alura.mail.ui.home.DefaultAppBar
 
 @Composable
@@ -42,103 +45,126 @@ fun TranslateSettingsScreen(
     modifier: Modifier = Modifier,
     onBackClick: () -> Unit = {}
 ) {
-    val translateSettingsViewModel = viewModel<TranslateSettingsViewModel>()
+    val translateSettingsViewModel = hiltViewModel<TranslateSettingsViewModel>()
     val state by translateSettingsViewModel.uiState.collectAsState()
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-            .fillMaxSize()
-            .padding(vertical = 16.dp),
-    ) {
-        DefaultAppBar(
-            title = stringResource(id = R.string.language_settings),
-            onBack = { onBackClick() }
-        )
+    DefaultAppBar(
+        title = stringResource(id = R.string.language_settings),
+        onBack = { onBackClick() },
+        modifier = Modifier.height(56.dp),
+    )
 
-        Text(
-            text = "Ao fazer o download de um idioma, você pode traduzir os e-mails recebidos para esse idioma mesmo sem conexão com a internet.",
-            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-            modifier = modifier.padding(horizontal = 16.dp),
-        )
+    when (state.loadModelsState) {
+        AppState.Loading -> {
+            LoadScreen()
+        }
 
-        Spacer(modifier = Modifier.size(8.dp))
+        AppState.Error -> {
+            Text(
+                text = "Nenhum idioma disponível",
+                modifier = Modifier.fillMaxSize(),
+                textAlign = TextAlign.Center
+            )
+        }
 
-        LazyColumn {
-            if (state.downloadedLanguageModels.isNotEmpty()) {
-                item {
-                    SeparatorLanguageItem("Download concluído")
-                    state.downloadedLanguageModels.forEach { language ->
-                        LanguageItem(
-                            languageModel = language,
-                            onClick = {
-                                translateSettingsViewModel.selectedLanguage(language)
-                                translateSettingsViewModel.changeShowDeleteLanguageDialog(true)
+        AppState.Loaded -> {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = modifier
+                    .fillMaxSize()
+            ) {
+                Spacer(modifier = Modifier.size(56.dp))
+
+                LazyColumn {
+                    if (state.downloadedLanguageModels.isNotEmpty()) {
+                        item {
+                            Text(
+                                text = "Ao fazer o download de um idioma, você pode traduzir os e-mails recebidos para esse idioma mesmo sem conexão com a internet.",
+                                fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                                modifier = modifier.padding(16.dp),
+                            )
+                        }
+
+                        item {
+                            SeparatorLanguageItem("Download concluído")
+                            state.downloadedLanguageModels.forEach { language ->
+                                LanguageItem(
+                                    languageModel = language,
+                                    onClick = {
+                                        translateSettingsViewModel.selectedLanguage(language)
+                                        translateSettingsViewModel.changeShowDeleteLanguageDialog(
+                                            true
+                                        )
+                                    }
+                                )
                             }
-                        )
+                        }
+                    }
+
+                    if (state.notDownloadedLanguageModels.isNotEmpty()) {
+                        item {
+                            SeparatorLanguageItem("Toque para fazer o download")
+                            state.notDownloadedLanguageModels.forEach { language ->
+                                LanguageItem(
+                                    languageModel = language,
+                                    onClick = {
+                                        translateSettingsViewModel.selectedLanguage(language)
+                                        translateSettingsViewModel.changeShowDownloadLanguageDialog(
+                                            true
+                                        )
+                                    }
+                                )
+                            }
+                        }
                     }
                 }
             }
 
-            if (state.notDownloadedLanguageModels.isNotEmpty()) {
-                item {
-                    SeparatorLanguageItem("Toque para fazer o download")
-                    state.notDownloadedLanguageModels.forEach { language ->
-                        LanguageItem(
-                            languageModel = language,
-                            onClick = {
-                                translateSettingsViewModel.selectedLanguage(language)
-                                translateSettingsViewModel.changeShowDownloadLanguageDialog(true)
-                            }
-                        )
-                    }
+            if (state.showDownloadLanguageDialog && state.selectedLanguageModel != null) {
+                state.selectedLanguageModel?.let { selectedLanguage ->
+                    LanguageDialog(
+                        title = "${selectedLanguage.name} (${selectedLanguage.size})",
+                        description = "Para traduzir os e-mails recebidos para esse idioma mesmo sem conexão com a internet, faça o download do arquivo de tradução.",
+                        confirmText = "Download",
+                        onDismiss = {
+                            translateSettingsViewModel.changeShowDownloadLanguageDialog(false)
+                        },
+                        onConfirm = {
+                            translateSettingsViewModel.changeDownloadState(
+                                languageModel = selectedLanguage,
+                                downloadState = DownloadState.DOWNLOADING
+                            )
+
+                            translateSettingsViewModel.downloadLanguage(
+                                languageModel = selectedLanguage
+                            )
+                            translateSettingsViewModel.changeShowDownloadLanguageDialog(false)
+                        }
+                    )
                 }
             }
-        }
-    }
 
-    if (state.showDownloadLanguageDialog && state.selectedLanguageModel != null) {
-        state.selectedLanguageModel?.let { selectedLanguage ->
-            LanguageDialog(
-                title = "${selectedLanguage.name} (${selectedLanguage.size})",
-                description = "Para traduzir os e-mails recebidos para esse idioma mesmo sem conexão com a internet, faça o download do arquivo de tradução.",
-                confirmText = "Download",
-                onDismiss = {
-                    translateSettingsViewModel.changeShowDownloadLanguageDialog(false)
-                },
-                onConfirm = {
-                    translateSettingsViewModel.changeDownloadState(
-                        languageModel = selectedLanguage,
-                        downloadState = DownloadState.DOWNLOADING
-                    )
 
-                    translateSettingsViewModel.downloadLanguage(
-                        languageModel = selectedLanguage
+            if (state.showDeleteLanguageDialog && state.selectedLanguageModel != null) {
+                state.selectedLanguageModel?.let { selectedLanguage ->
+                    LanguageDialog(
+                        title = "${selectedLanguage.name} (${selectedLanguage.size})",
+                        description = "Se você remover este arquivo de tradução, não poderá traduzir os e-mails recebidos para esse idioma até fazer o download novamente.",
+                        confirmText = "Remover",
+                        onDismiss = {
+                            translateSettingsViewModel.changeShowDeleteLanguageDialog(false)
+                        },
+                        onConfirm = {
+                            translateSettingsViewModel.changeDownloadState(
+                                languageModel = selectedLanguage,
+                                downloadState = DownloadState.NOT_DOWNLOADED
+                            )
+                            translateSettingsViewModel.changeShowDeleteLanguageDialog(false)
+                        }
                     )
-                    translateSettingsViewModel.changeShowDownloadLanguageDialog(false)
                 }
-            )
-        }
-    }
+            }
 
-
-    if (state.showDeleteLanguageDialog && state.selectedLanguageModel != null) {
-        state.selectedLanguageModel?.let { selectedLanguage ->
-            LanguageDialog(
-                title = "${selectedLanguage.name} (${selectedLanguage.size})",
-                description = "Se você remover este arquivo de tradução, não poderá traduzir os e-mails recebidos para esse idioma até fazer o download novamente.",
-                confirmText = "Remover",
-                onDismiss = {
-                    translateSettingsViewModel.changeShowDeleteLanguageDialog(false)
-                },
-                onConfirm = {
-                    translateSettingsViewModel.changeDownloadState(
-                        languageModel = selectedLanguage,
-                        downloadState = DownloadState.NOT_DOWNLOADED
-                    )
-                    translateSettingsViewModel.changeShowDeleteLanguageDialog(false)
-                }
-            )
         }
     }
 

@@ -124,10 +124,12 @@ fun HomeNavHost(
 @Composable
 fun DefaultAppBar(
     title: String,
+    modifier: Modifier = Modifier,
     scrollBehavior: TopAppBarScrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(),
-    onBack: () -> Unit
+    onBack: () -> Unit,
 ) {
     TopAppBar(
+        modifier = modifier,
         title = {
             Text(
                 text = title,

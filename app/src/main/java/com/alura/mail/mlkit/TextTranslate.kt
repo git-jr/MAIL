@@ -1,7 +1,7 @@
 package com.alura.mail.mlkit
 
-import android.content.Context
 import android.util.Log
+import com.alura.mail.FileUtil
 import com.alura.mail.model.DownloadState
 import com.alura.mail.model.Language
 import com.alura.mail.model.LanguageModel
@@ -13,13 +13,12 @@ import com.google.mlkit.nl.translate.TranslateLanguage
 import com.google.mlkit.nl.translate.TranslateRemoteModel
 import com.google.mlkit.nl.translate.Translation
 import com.google.mlkit.nl.translate.TranslatorOptions
-import java.io.File
 
 private const val LANGUAGE_TAG = "LanguageIdentification"
 private const val TRANSLATE_TAG = "TranslateTag"
 const val DOWNLOAD_TAG = "DownloadTag"
 
-class TextTranslate {
+class TextTranslate(private val fileUtil: FileUtil) {
     fun verifyModelDownloaded(
         targetLanguage: String,
         onSuccessful: () -> Unit = {},
@@ -105,7 +104,6 @@ class TextTranslate {
 
 
     fun getDownloadedModels(
-        context: Context,
         onSuccessful: (List<LanguageModel>) -> Unit = {},
         onFailure: () -> Unit = {}
     ) {
@@ -113,24 +111,22 @@ class TextTranslate {
 
         modelManager.getDownloadedModels(TranslateRemoteModel::class.java)
             .addOnSuccessListener { models: MutableSet<TranslateRemoteModel> ->
+                val languageModels = mutableListOf<LanguageModel>()
 
                 models.forEach { model ->
-                    Log.e(DOWNLOAD_TAG, "model: $model")
-                    Log.e(DOWNLOAD_TAG, "Name: ${model.modelName.toString()}")
-                    Log.e(DOWNLOAD_TAG, "NameForBackend: ${model.modelNameForBackend}")
-                    Log.e(DOWNLOAD_TAG, "Size: ${getSizeModel(context, model.modelNameForBackend)}")
+                    try {
+                        languageModels.add(
+                            LanguageModel(
+                                id = model.language,
+                                name = codeNameLanguagesMap[model.language] ?: model.language,
+                                downloadState = DownloadState.DOWNLOADED,
+                                size = fileUtil.getSizeModel(model.modelNameForBackend)
+                            )
+                        )
+                    } catch (e: Exception) {
+                        Log.e(DOWNLOAD_TAG, "Error: $e")
+                    }
                 }
-
-
-                val languageModels = models.map {
-                    LanguageModel(
-                        id = it.uniqueModelNameForPersist,
-                        name = it.language,
-                        downloadState = DownloadState.DOWNLOADED,
-                        size = getSizeModel(context, it.modelNameForBackend)
-                    )
-                }
-
                 onSuccessful(languageModels)
             }
             .addOnFailureListener {
@@ -138,6 +134,26 @@ class TextTranslate {
                 onFailure()
             }
 
+    }
+
+
+    fun getAllModels(): List<LanguageModel> {
+        val languageModels = mutableListOf<LanguageModel>()
+
+        TranslateLanguage.BELARUSIAN
+        TranslateLanguage.getAllLanguages().forEach {
+            Log.i(TRANSLATE_TAG, "Idioma: $it")
+            languageModels.add(
+                LanguageModel(
+                    id = it,
+                    name = codeNameLanguagesMap[it] ?: it,
+                    downloadState = DownloadState.NOT_DOWNLOADED,
+                    size = "",
+                )
+            )
+        }
+
+        return languageModels
     }
 
     fun verifyIfModelAreAvailableAndDownloadAutomatically(
@@ -306,40 +322,7 @@ class TextTranslate {
         }
 
     }
-}
 
-fun getSizeModel(context: Context, modelName: String): String {
-    val modelFile =
-        File(context.filesDir.parent, "no_backup/com.google.mlkit.translate.models/$modelName")
-
-    return if (modelFile.exists()) {
-        formatBytesToMB(getFolderSize(modelFile))
-    } else {
-        "0 MB"
-    }
-}
-
-// Função para obter o tamanho de uma pasta recursivamente
-private fun getFolderSize(folder: File): Long {
-    var size: Long = 0
-
-    if (folder.exists()) {
-        val files = folder.listFiles()
-        if (files != null) {
-            for (file in files) {
-                if (file.isFile) {
-                    size += file.length()
-                } else if (file.isDirectory) {
-                    size += getFolderSize(file)
-                }
-            }
-        }
-    }
-    return size
-}
-
-fun formatBytesToMB(bytes: Long): String {
-    return "${bytes / 1024 / 1024} MB"
 }
 
 val codeNameLanguagesMap = mapOf(
@@ -348,7 +331,7 @@ val codeNameLanguagesMap = mapOf(
     "ar" to "árabe",
     "ar-latn" to "árabe",
     "az" to "azerbaijano",
-    "ser" to "bielorrusso",
+    "be" to "bielorrusso",
     "bg" to "búlgaro",
     "bg-latn" to "búlgaro",
     "bn" to "bengali",

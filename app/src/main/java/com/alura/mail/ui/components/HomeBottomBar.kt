@@ -55,7 +55,7 @@ fun HomeBottomBar(
 
 private val screenItems = listOf(
     ScreenItem(
-        title = "Home",
+        title = "Início",
         route = emailListRoute,
         resourceId = Pair(
             Icons.Filled.Home,

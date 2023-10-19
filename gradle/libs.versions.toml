@@ -16,6 +16,11 @@ navigation-compose = "2.7.4"
 mlkit-translate = "17.0.1"
 mlkit-language-id = "17.0.4"
 
+ksp = "1.9.0-1.0.13"
+dagger-compiler = "2.48"
+hilt-android = "2.48"
+hilt-navigation-compose = "1.0.0"
+
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -39,7 +44,14 @@ material3 = { group = "androidx.compose.material3", name = "material3" }
 mlkit-language = { module = "com.google.mlkit:language-id", version.ref = "mlkit-language-id" }
 mlkit-translate = { module = "com.google.mlkit:translate", version.ref = "mlkit-translate" }
 
+dagger-compiler = { module = "com.google.dagger:dagger-compiler", version.ref = "dagger-compiler" }
+hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt-android" }
+hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "dagger-compiler" }
+hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hilt-navigation-compose" }
+
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt-android" }
 
