@@ -37,7 +37,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.alura.mail.R
 import com.alura.mail.extensions.toFormattedDate
 import com.alura.mail.model.Email
@@ -47,7 +47,7 @@ import com.alura.mail.ui.settings.LanguageDialog
 
 @Composable
 fun ContentEmailScreen(onBackClick: () -> Unit = {}) {
-    val viewModel = viewModel<ContentEmailViewModel>()
+    val viewModel = hiltViewModel<ContentEmailViewModel>()
     val state by viewModel.uiState.collectAsState()
 
     state.selectedEmail?.let { email ->
@@ -64,7 +64,7 @@ fun ContentEmailScreen(onBackClick: () -> Unit = {}) {
                 onBack = { onBackClick() }
             )
             EmailHeader(email)
-            if (state.needTranslate) {
+            if (state.canBeTranslate) {
                 EmailSubHeader(
                     textTranslateFor = textTranslateFor,
                     translatedState = state.translatedState
@@ -169,13 +169,6 @@ private fun EmailHeader(email: Email) {
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        Text(
-            text = email.subject,
-            fontSize = MaterialTheme.typography.titleLarge.fontSize,
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -232,6 +225,6 @@ private fun EmailHeader(email: Email) {
 fun EmailContent(email: Email) {
     Text(
         text = email.content,
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 32.dp),
+        modifier = Modifier.padding(16.dp),
     )
 }

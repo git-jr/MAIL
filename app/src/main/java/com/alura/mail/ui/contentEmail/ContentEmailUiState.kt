@@ -9,7 +9,7 @@ data class ContentEmailUiState(
     val originalSubject: String? = null,
     val localLanguage: Language? = null,
     val languageIdentified: Language? = null,
-    val needTranslate: Boolean = false,
+    val canBeTranslate: Boolean = false,
     val translatedState: TranslatedState = TranslatedState.NOT_TRANSLATED,
     val showDownloadLanguageDialog: Boolean = false,
 )

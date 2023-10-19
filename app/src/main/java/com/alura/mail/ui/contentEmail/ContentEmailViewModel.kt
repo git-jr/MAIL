@@ -10,7 +10,6 @@ import com.alura.mail.mlkit.TextTranslate
 import com.alura.mail.model.Language
 import com.alura.mail.ui.navigation.emailIdArgument
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -55,6 +54,13 @@ class ContentEmailViewModel @Inject constructor(
                         languageIdentified = language,
                     )
                     verifyIfNeedTranslate()
+                },
+                onFailure = {
+                    _uiState.value = _uiState.value.copy(
+                        languageIdentified = null,
+                        canBeTranslate = false
+                    )
+                    return@identifyLanguage
                 }
             )
         }
@@ -98,7 +104,7 @@ class ContentEmailViewModel @Inject constructor(
         if (languageIdentified != null && localLanguage != null) {
             if (languageIdentified.code != localLanguage.code) {
                 _uiState.value = _uiState.value.copy(
-                    needTranslate = true
+                    canBeTranslate = true
                 )
             }
         }

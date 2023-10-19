@@ -26,6 +26,17 @@ fun generateRandomDateInMillis(weeksAgo: Int): Long {
 
 val listOfEmails = listOf(
     Email(
+        id = "0",
+        subject = "Zulu Ukuhlola okukodwa okubili",
+        content = "Lena i-imeyili yokuhlola ebhalwe ngesiZulu",
+        time = generateRandomDateInMillis(1),
+        color = 0xFF000000,
+        user = User(
+            "Não traduzivel de teste",
+            ""
+        ),
+    ),
+    Email(
         id = "1",
         subject = "Um novo curso de Android com IA",
         content = "Olá, tudo bem? Estamos aqui para te avisar que o curso de Android está com uma promoção imperdível. Corra e garanta já a sua vaga! ",

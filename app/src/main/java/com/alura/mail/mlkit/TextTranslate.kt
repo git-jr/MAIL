@@ -118,7 +118,7 @@ class TextTranslate(private val fileUtil: FileUtil) {
                         languageModels.add(
                             LanguageModel(
                                 id = model.language,
-                                name = codeNameLanguagesMap[model.language] ?: model.language,
+                                name = languagesNames[model.language] ?: model.language,
                                 downloadState = DownloadState.DOWNLOADED,
                                 size = fileUtil.getSizeModel(model.modelNameForBackend)
                             )
@@ -140,13 +140,12 @@ class TextTranslate(private val fileUtil: FileUtil) {
     fun getAllModels(): List<LanguageModel> {
         val languageModels = mutableListOf<LanguageModel>()
 
-        TranslateLanguage.BELARUSIAN
         TranslateLanguage.getAllLanguages().forEach {
             Log.i(TRANSLATE_TAG, "Idioma: $it")
             languageModels.add(
                 LanguageModel(
                     id = it,
-                    name = codeNameLanguagesMap[it] ?: it,
+                    name = languagesNames[it] ?: it,
                     downloadState = DownloadState.NOT_DOWNLOADED,
                     size = "",
                 )
@@ -240,7 +239,7 @@ class TextTranslate(private val fileUtil: FileUtil) {
 
         languageIdentifier.identifyLanguage(text)
             .addOnSuccessListener { languageCode ->
-                val languageName = codeNameLanguagesMap[languageCode]
+                val languageName = languagesNames[languageCode]
                 if (languageCode == UNDETERMINED_LANGUAGE_TAG || languageName == null) {
                     Log.i(LANGUAGE_TAG, "Can't identify language.")
                     onFailure()
@@ -258,7 +257,7 @@ class TextTranslate(private val fileUtil: FileUtil) {
             .addOnSuccessListener { identifiedLanguages ->
                 for (identifiedLanguage in identifiedLanguages) {
                     val languageTag = identifiedLanguage.languageTag
-                    val languageName = codeNameLanguagesMap[languageTag]
+                    val languageName = languagesNames[languageTag]
                     val confidence = (identifiedLanguage.confidence * 100).toInt()
 
                     Log.i(
@@ -322,120 +321,6 @@ class TextTranslate(private val fileUtil: FileUtil) {
         }
 
     }
-
 }
-
-val codeNameLanguagesMap = mapOf(
-    "af" to "africâner",
-    "sou" to "amárico",
-    "ar" to "árabe",
-    "ar-latn" to "árabe",
-    "az" to "azerbaijano",
-    "be" to "bielorrusso",
-    "bg" to "búlgaro",
-    "bg-latn" to "búlgaro",
-    "bn" to "bengali",
-    "bs" to "bósnio",
-    "ca" to "catalão",
-    "ceb" to "cebuano",
-    "co" to "córsico",
-    "cs" to "tcheco",
-    "cy" to "galês",
-    "da" to "dinamarquês",
-    "de" to "alemão",
-    "el" to "grego",
-    "el-latn" to "grego",
-    "en" to "inglês",
-    "eo" to "esperanto",
-    "es" to "espanhol",
-    "et" to "estoniano",
-    "eu" to "basco",
-    "fa" to "persa",
-    "fi" to "finlandês",
-    "fil" to "filipino",
-    "fr" to "francês",
-    "fy" to "frísio ocidental",
-    "ga" to "irlandês",
-    "gd" to "escocês gaélico",
-    "gl" to "galego",
-    "gu" to "gujarati",
-    "ha" to "hauçá",
-    "haw" to "havaiana",
-    "he" to "hebraico",
-    "hi" to "hindi",
-    "hi-latn" to "hindi",
-    "hnn" to "hmong",
-    "hr" to "croata",
-    "ht" to "haitiano",
-    "hu" to "húngaro",
-    "hy" to "armênio",
-    "id" to "indonésio",
-    "ig" to "igbo",
-    "is" to "islandês",
-    "it" to "italiano",
-    "ja" to "japonês",
-    "jat-latn" to "japonês",
-    "jv" to "javanês",
-    "ka" to "georgiano",
-    "kk" to "cazaque",
-    "km" to "khmer",
-    "kn" to "canarim",
-    "ko" to "coreano",
-    "ku" to "curdo",
-    "ky" to "quirguiz",
-    "la" to "latina",
-    "lb" to "luxemburguês",
-    "lo" to "laosiano",
-    "lt" to "lituano",
-    "lv" to "letão",
-    "mg" to "malgaxe",
-    "mi" to "maori",
-    "mk" to "macedônio",
-    "ml" to "malaiala",
-    "mn" to "mongol",
-    "mr" to "marata",
-    "ms" to "malaio",
-    "mt" to "maltês",
-    "my" to "birmanês",
-    "ne" to "nepalês",
-    "nl" to "holandês",
-    "no" to "norueguês",
-    "ny" to "nianja",
-    "pa" to "punjabi",
-    "pl" to "polonês",
-    "ps" to "pashto",
-    "pt" to "português",
-    "ro" to "romeno",
-    "ru" to "russo",
-    "ru-latn" to "russo",
-    "sd" to "sindi",
-    "si" to "cingalês",
-    "sk" to "eslovaco",
-    "sl" to "esloveno",
-    "sm" to "samoano",
-    "sn" to "chona",
-    "so" to "somali",
-    "sq" to "albanês",
-    "sr" to "sérvio",
-    "st" to "sesotho",
-    "su" to "sundanês",
-    "sv" to "sueco",
-    "sw" to "suaíli",
-    "ta" to "tâmil",
-    "te" to "télugo",
-    "tg" to "tajique",
-    "th" to "tailandês",
-    "tr" to "turco",
-    "uk" to "ucraniano",
-    "ur" to "urdu",
-    "uz" to "usbeque",
-    "vi" to "vietnamita",
-    "xh" to "xhosa",
-    "yi" to "ídiche",
-    "yo" to "iorubá",
-    "zh" to "chinês",
-    "zh-lattn" to "chinês",
-    "zu" to "zulu"
-)
 
 

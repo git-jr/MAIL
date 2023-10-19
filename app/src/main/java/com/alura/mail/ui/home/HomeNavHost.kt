@@ -25,7 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -39,7 +39,6 @@ import com.alura.mail.ui.navigation.contentEmailScreen
 import com.alura.mail.ui.navigation.emailListRoute
 import com.alura.mail.ui.navigation.emailsListScreen
 import com.alura.mail.ui.navigation.navigateToContentEmailScreen
-import com.alura.mail.ui.navigation.translateSettingsRoute
 import com.alura.mail.ui.navigation.translateSettingsScreen
 
 @Composable
@@ -48,7 +47,7 @@ fun HomeNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController()
 ) {
-    val homeViewModel = viewModel<HomeViewModel>()
+    val homeViewModel = hiltViewModel<HomeViewModel>()
     val state by homeViewModel.uiState.collectAsState()
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -98,8 +97,7 @@ fun HomeNavHost(
         ) {
             NavHost(
                 navController = navController,
-//                startDestination = emailListRoute,
-                startDestination = translateSettingsRoute,
+                startDestination = emailListRoute,
                 modifier = modifier,
                 enterTransition = { fadeIn(animationSpec = tween(200)) },
                 exitTransition = { fadeOut(animationSpec = tween(200)) },
