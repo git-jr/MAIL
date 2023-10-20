@@ -111,8 +111,6 @@ class ContentEmailViewModel @Inject constructor(
     }
 
     fun tryTranslateEmail() {
-        setTranslateState(TranslatedState.TRANSLATING)
-
         // se já foi traduzido volta ao original
         if (_uiState.value.translatedState == TranslatedState.TRANSLATED) {
             _uiState.value.selectedEmail?.let { email ->
@@ -125,6 +123,7 @@ class ContentEmailViewModel @Inject constructor(
                 )
             }
         } else {
+            setTranslateState(TranslatedState.TRANSLATING)
             val languageIdentified = _uiState.value.languageIdentified?.code ?: return
             textTranslate.verifyModelDownloaded(
                 languageIdentified,

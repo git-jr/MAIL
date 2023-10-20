@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -27,7 +26,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -37,7 +35,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.alura.mail.R
 import com.alura.mail.model.DownloadState
 import com.alura.mail.model.LanguageModel
-import com.alura.mail.ui.components.DefaultAppBar
 import com.alura.mail.ui.components.LoadScreen
 
 @Composable
@@ -47,12 +44,6 @@ fun TranslateSettingsScreen(
 ) {
     val translateSettingsViewModel = hiltViewModel<TranslateSettingsViewModel>()
     val state by translateSettingsViewModel.uiState.collectAsState()
-
-    DefaultAppBar(
-        title = stringResource(id = R.string.language_settings),
-        onBack = { onBackClick() },
-        modifier = Modifier.height(52.dp),
-    )
 
     when (state.loadModelsState) {
         AppState.Loading -> {
@@ -73,8 +64,6 @@ fun TranslateSettingsScreen(
                 modifier = modifier
                     .fillMaxSize()
             ) {
-                Spacer(modifier = Modifier.size(52.dp))
-
                 LazyColumn {
                     if (state.downloadedLanguageModels.isNotEmpty()) {
                         item {

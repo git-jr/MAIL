@@ -34,7 +34,7 @@ val languagesNames = mapOf(
     "ja" to "japonês",
     "ka" to "georgiano",
     "km" to "khmer",
-    "kn" to "canarim",
+    "kn" to "canarim (kannada)",
     "ko" to "coreano",
     "lt" to "lituano",
     "lv" to "letão",

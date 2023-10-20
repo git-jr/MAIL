@@ -23,7 +23,7 @@ class TranslateSettingsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            delay(5000)
+            delay(2500)
             loadLanguages()
         }
     }

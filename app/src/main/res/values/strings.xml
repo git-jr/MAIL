@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">MAIL</string>
     <string name="language_settings">Configurações de idioma</string>
+    <string name="back">Voltar</string>
+    <string name="search_email">Pesquisar email</string>
+    <string name="default_appbar_title" />
+
 </resources>

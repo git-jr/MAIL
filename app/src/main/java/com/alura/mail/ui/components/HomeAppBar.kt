@@ -28,7 +28,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.alura.mail.R
-import com.alura.mail.extensions.toFormattedDate
 
 @ExperimentalMaterial3Api
 @Composable
@@ -66,7 +65,7 @@ fun HomeAppBar(scrollBehavior: TopAppBarScrollBehavior) {
                 }
 
                 Text(
-                    text = "Pesquisar no e-mail ${System.currentTimeMillis().toFormattedDate()}",
+                    text = "Pesquisar email",
                     color = MaterialTheme.colorScheme.onSurface,
                 )
                 Row(

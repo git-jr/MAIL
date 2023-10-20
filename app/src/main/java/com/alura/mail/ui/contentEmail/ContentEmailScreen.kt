@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
 package com.alura.mail.ui.contentEmail
 
 import androidx.compose.foundation.background
@@ -20,7 +18,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -41,12 +38,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.alura.mail.R
 import com.alura.mail.extensions.toFormattedDate
 import com.alura.mail.model.Email
-import com.alura.mail.ui.components.DefaultAppBar
 import com.alura.mail.ui.components.LoadScreen
 import com.alura.mail.ui.settings.LanguageDialog
 
 @Composable
-fun ContentEmailScreen(onBackClick: () -> Unit = {}) {
+fun ContentEmailScreen() {
     val viewModel = hiltViewModel<ContentEmailViewModel>()
     val state by viewModel.uiState.collectAsState()
 
@@ -59,10 +55,6 @@ fun ContentEmailScreen(onBackClick: () -> Unit = {}) {
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
         ) {
-            DefaultAppBar(
-                title = email.subject,
-                onBack = { onBackClick() }
-            )
             EmailHeader(email)
             if (state.canBeTranslate) {
                 EmailSubHeader(
