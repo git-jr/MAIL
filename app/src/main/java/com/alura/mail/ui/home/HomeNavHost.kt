@@ -5,6 +5,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -38,7 +39,6 @@ import com.alura.mail.ui.navigation.contentEmailScreen
 import com.alura.mail.ui.navigation.emailListRoute
 import com.alura.mail.ui.navigation.emailsListScreen
 import com.alura.mail.ui.navigation.navigateToContentEmailScreen
-import com.alura.mail.ui.navigation.translateSettingsRoute
 import com.alura.mail.ui.navigation.translateSettingsScreen
 
 @Composable
@@ -117,41 +117,6 @@ fun HomeNavHost(
             }
         }
     }
-}
-
-@ExperimentalMaterial3Api
-@Composable
-fun DefaultAppBar(
-    title: String,
-    modifier: Modifier = Modifier,
-    scrollBehavior: TopAppBarScrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(),
-    onBack: () -> Unit,
-) {
-    TopAppBar(
-        modifier = modifier,
-        title = {
-            Text(
-                text = title,
-                color = MaterialTheme.colorScheme.primary,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-        },
-        scrollBehavior = scrollBehavior,
-        navigationIcon = {
-            IconButton(onClick = { onBack() }) {
-                Icon(
-                    imageVector = Icons.Filled.ArrowBack,
-                    contentDescription = "buscar",
-                    modifier = Modifier,
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f),
-        ),
-    )
 }
 
 fun NavHostController.navigateDirect(rota: String) = this.navigate(rota) {

@@ -37,8 +37,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.alura.mail.R
 import com.alura.mail.model.DownloadState
 import com.alura.mail.model.LanguageModel
+import com.alura.mail.ui.components.DefaultAppBar
 import com.alura.mail.ui.components.LoadScreen
-import com.alura.mail.ui.home.DefaultAppBar
 
 @Composable
 fun TranslateSettingsScreen(
@@ -51,7 +51,7 @@ fun TranslateSettingsScreen(
     DefaultAppBar(
         title = stringResource(id = R.string.language_settings),
         onBack = { onBackClick() },
-        modifier = Modifier.height(56.dp),
+        modifier = Modifier.height(52.dp),
     )
 
     when (state.loadModelsState) {
@@ -73,7 +73,7 @@ fun TranslateSettingsScreen(
                 modifier = modifier
                     .fillMaxSize()
             ) {
-                Spacer(modifier = Modifier.size(56.dp))
+                Spacer(modifier = Modifier.size(52.dp))
 
                 LazyColumn {
                     if (state.downloadedLanguageModels.isNotEmpty()) {

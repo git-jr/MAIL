@@ -41,8 +41,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.alura.mail.R
 import com.alura.mail.extensions.toFormattedDate
 import com.alura.mail.model.Email
+import com.alura.mail.ui.components.DefaultAppBar
 import com.alura.mail.ui.components.LoadScreen
-import com.alura.mail.ui.home.DefaultAppBar
 import com.alura.mail.ui.settings.LanguageDialog
 
 @Composable

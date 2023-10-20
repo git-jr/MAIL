@@ -1,12 +1,15 @@
 package com.alura.mail.ui.settings
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.alura.mail.mlkit.TextTranslate
 import com.alura.mail.model.DownloadState
 import com.alura.mail.model.LanguageModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import java.util.UUID
 import javax.inject.Inject
 
@@ -19,7 +22,10 @@ class TranslateSettingsViewModel @Inject constructor(
     var uiState = _uiState.asStateFlow()
 
     init {
-        loadLanguages()
+        viewModelScope.launch {
+            delay(5000)
+            loadLanguages()
+        }
     }
 
     private fun loadLanguages() {
