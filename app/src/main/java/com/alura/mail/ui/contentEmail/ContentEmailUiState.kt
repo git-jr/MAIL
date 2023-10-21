@@ -12,6 +12,7 @@ data class ContentEmailUiState(
     val canBeTranslate: Boolean = false,
     val translatedState: TranslatedState = TranslatedState.NOT_TRANSLATED,
     val showDownloadLanguageDialog: Boolean = false,
+    val showTranslateButton: Boolean = true,
 )
 
 enum class TranslatedState {

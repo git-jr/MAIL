@@ -137,7 +137,7 @@ fun HomeNavHost(
                     listState = listState,
                 )
                 contentEmailScreen()
-                translateSettingsScreen(navController = navController)
+                translateSettingsScreen()
             }
         }
     }

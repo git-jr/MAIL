@@ -1,5 +1,6 @@
 package com.alura.mail.ui.contentEmail
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,7 +18,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -57,11 +59,19 @@ fun ContentEmailScreen() {
         ) {
             EmailHeader(email)
             if (state.canBeTranslate) {
-                EmailSubHeader(
-                    textTranslateFor = textTranslateFor,
-                    translatedState = state.translatedState
+                AnimatedVisibility(
+                    visible = state.showTranslateButton,
                 ) {
-                    viewModel.tryTranslateEmail()
+                    EmailSubHeader(
+                        textTranslateFor = textTranslateFor,
+                        translatedState = state.translatedState,
+                        onTranslate = {
+                            viewModel.tryTranslateEmail()
+                        },
+                        onClose = {
+                            viewModel.hideTranslateButton()
+                        },
+                    )
                 }
             }
             EmailContent(email)
@@ -91,66 +101,70 @@ fun ContentEmailScreen() {
 private fun EmailSubHeader(
     textTranslateFor: String,
     translatedState: TranslatedState,
-    onClick: () -> Unit = {}
+    onTranslate: () -> Unit = {},
+    onClose: () -> Unit = {},
 ) {
-    Spacer(modifier = Modifier.height(8.dp))
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
+    Column {
+        Spacer(modifier = Modifier.height(8.dp))
         Row(
-            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .clickable { onClick() }
-                .padding(16.dp)
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_translate),
-                contentDescription = "Traduzir",
-                tint = Color.Gray,
-                modifier = Modifier.size(24.dp)
-            )
-
-            Spacer(modifier = Modifier.size(16.dp))
-
-            Column {
-                Text(
-                    text = textTranslateFor,
-                    fontSize = MaterialTheme.typography.titleSmall.fontSize,
-                    color = if (translatedState == TranslatedState.TRANSLATED) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.inverseOnSurface,
-                    fontWeight = if (translatedState == TranslatedState.TRANSLATED) FontWeight.Normal else FontWeight.Bold
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .clickable { onTranslate() }
+                    .padding(16.dp)
+                    .weight(0.8f)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_translate),
+                    contentDescription = "Traduzir",
+                    tint = Color.Gray,
+                    modifier = Modifier.size(24.dp)
                 )
-                if (translatedState == TranslatedState.TRANSLATED) {
+
+                Spacer(modifier = Modifier.size(16.dp))
+
+                Column {
                     Text(
-                        text = "Mostrar original",
-                        fontSize = MaterialTheme.typography.labelMedium.fontSize,
-                        color = MaterialTheme.colorScheme.inverseOnSurface,
-                        fontWeight = FontWeight.Bold
+                        text = textTranslateFor,
+                        fontSize = MaterialTheme.typography.titleSmall.fontSize,
+                        color = if (translatedState == TranslatedState.TRANSLATED) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.inverseOnSurface,
+                        fontWeight = if (translatedState == TranslatedState.TRANSLATED) FontWeight.Normal else FontWeight.Bold
                     )
+                    if (translatedState == TranslatedState.TRANSLATED) {
+                        Text(
+                            text = "Mostrar original",
+                            fontSize = MaterialTheme.typography.labelMedium.fontSize,
+                            color = MaterialTheme.colorScheme.inverseOnSurface,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
+            }
+
+            IconButton(
+                modifier = Modifier.weight(0.1f),
+                onClick = { onClose() }
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Close,
+                    contentDescription = "Mais informações",
+                    tint = Color.Gray,
+                    modifier = Modifier.size(24.dp)
+                )
             }
         }
 
-        IconButton(
-            modifier = Modifier.padding(horizontal = 4.dp),
-            onClick = { /*TODO*/ }
-        ) {
-            Icon(
-                imageVector = Icons.Outlined.Settings,
-                contentDescription = "Mais informações",
-                tint = Color.Gray,
-                modifier = Modifier.size(24.dp)
+        if (translatedState == TranslatedState.TRANSLATING) {
+            LinearProgressIndicator(
+                modifier = Modifier.fillMaxWidth(),
             )
         }
-    }
-
-    if (translatedState == TranslatedState.TRANSLATING) {
-        LinearProgressIndicator(
-            modifier = Modifier.fillMaxWidth(),
-        )
     }
 }
 
@@ -159,10 +173,11 @@ private fun EmailHeader(email: Email) {
     Column(
         Modifier
             .fillMaxWidth()
-            .padding(16.dp)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -210,13 +225,24 @@ private fun EmailHeader(email: Email) {
                 Icons.Default.MoreVert, "Mais informações",
             )
         }
+        Divider(
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
+        )
+        Spacer(modifier = Modifier.height(8.dp))
     }
 }
 
 @Composable
 fun EmailContent(email: Email) {
     Text(
+        text = email.subject,
+        modifier = Modifier.padding(16.dp),
+        fontSize = MaterialTheme.typography.titleLarge.fontSize,
+    )
+
+    Text(
         text = email.content,
         modifier = Modifier.padding(16.dp),
+        fontSize = MaterialTheme.typography.titleMedium.fontSize,
     )
 }

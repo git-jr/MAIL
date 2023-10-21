@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
 package com.alura.mail.ui.settings
 
 import androidx.compose.foundation.background
@@ -14,36 +12,55 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import com.alura.mail.R
 import com.alura.mail.model.DownloadState
 import com.alura.mail.model.LanguageModel
 import com.alura.mail.ui.components.LoadScreen
 
 @Composable
-fun TranslateSettingsScreen(
-    modifier: Modifier = Modifier,
-    onBackClick: () -> Unit = {}
-) {
+fun TranslateSettingsScreen(modifier: Modifier = Modifier) {
     val translateSettingsViewModel = hiltViewModel<TranslateSettingsViewModel>()
     val state by translateSettingsViewModel.uiState.collectAsState()
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_START) {
+                translateSettingsViewModel.loadLanguages()
+            } else if (event == Lifecycle.Event.ON_STOP) {
+                translateSettingsViewModel.cleanAllStates()
+            }
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
 
     when (state.loadModelsState) {
         AppState.Loading -> {
@@ -269,7 +286,7 @@ private fun getIconByLanguage(languageModel: LanguageModel) = when (languageMode
 @Composable
 private fun getDescriptionByLanguage(languageModel: LanguageModel) =
     when (languageModel.downloadState) {
-        DownloadState.DOWNLOADED -> "Idioma baixado"
-        DownloadState.DOWNLOADING -> "Baixando idioma"
-        DownloadState.NOT_DOWNLOADED -> "Toque para fazer o download"
+        DownloadState.DOWNLOADED -> stringResource(R.string.idioma_baixado)
+        DownloadState.DOWNLOADING -> stringResource(R.string.baixando_idioma)
+        DownloadState.NOT_DOWNLOADED -> stringResource(R.string.toque_para_fazer_o_download)
     }

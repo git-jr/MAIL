@@ -23,20 +23,15 @@ class TranslateSettingsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            delay(2500)
+            delay(1000)
             loadLanguages()
         }
     }
 
-    private fun loadLanguages() {
-        // carregar todos idiomas primeiro, depois carrgar os baixados
-        // e fazer filtro, depois mudar estado de loading para loaded
-
-        // carregar todos os idiomas disponíveis
+    internal fun loadLanguages() {
         _uiState.value = _uiState.value.copy(
             allLanguageModels = textTranslate.getAllModels().sortedBy { it.name }
         )
-        // carregar os idiomas baixados e de lá já faz a filtragem
         loadDownloadedLanguages()
     }
 
@@ -175,6 +170,14 @@ class TranslateSettingsViewModel @Inject constructor(
         )
 
         updateLanguages(languageModels)
+    }
+
+    fun onDispose() {
+//        textTranslate.close()
+    }
+
+    fun cleanAllStates() {
+        _uiState.value = TranslateSettingsUiState()
     }
 
 }

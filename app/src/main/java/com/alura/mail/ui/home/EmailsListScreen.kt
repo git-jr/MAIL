@@ -28,7 +28,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.alura.mail.dao.EmailDao
 import com.alura.mail.extensions.toFormattedDate
 import com.alura.mail.model.Email
@@ -39,7 +39,7 @@ fun EmailsListScreen(
     onClick: (Email) -> Unit,
     listState: LazyListState
 ) {
-    val homeViewModel = viewModel<HomeViewModel>()
+    val homeViewModel = hiltViewModel<HomeViewModel>()
     val state by homeViewModel.uiState.collectAsState()
 
     LazyColumn(

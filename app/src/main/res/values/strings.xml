@@ -4,5 +4,8 @@
     <string name="back">Voltar</string>
     <string name="search_email">Pesquisar email</string>
     <string name="default_appbar_title" />
+    <string name="idioma_baixado">Idioma baixado</string>
+    <string name="baixando_idioma">Baixando idioma</string>
+    <string name="toque_para_fazer_o_download">Toque para fazer o download</string>
 
 </resources>

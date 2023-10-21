@@ -212,4 +212,10 @@ class ContentEmailViewModel @Inject constructor(
             showDownloadLanguageDialog = show
         )
     }
+
+    fun hideTranslateButton() {
+        _uiState.value = _uiState.value.copy(
+            showTranslateButton = false
+        )
+    }
 }
