@@ -1,4 +1,4 @@
-package com.alura.mail
+package com.alura.mail.util
 
 import android.content.Context
 import java.io.File
@@ -11,7 +11,6 @@ class FileUtil(private val context: Context) {
 
         return formatBytesToMB(getFolderSize(modelFile))
     }
-
 
     private fun getFolderSize(folder: File): Long {
         var size: Long = 0
@@ -32,5 +31,4 @@ class FileUtil(private val context: Context) {
     private fun formatBytesToMB(bytes: Long): String {
         return "${bytes / 1024 / 1024} MB"
     }
-
 }

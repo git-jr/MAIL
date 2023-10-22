@@ -29,9 +29,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.alura.mail.dao.EmailDao
 import com.alura.mail.extensions.toFormattedDate
 import com.alura.mail.model.Email
+import com.alura.mail.samples.EmailDao
 
 
 @Composable
@@ -87,7 +87,6 @@ fun EmailItem(
                 overflow = TextOverflow.Ellipsis,
             )
         },
-
         leadingContent = {
             Box(
                 modifier = Modifier
@@ -102,7 +101,6 @@ fun EmailItem(
                     fontSize = 22.sp,
                 )
             }
-
         },
         trailingContent = {
             Column {

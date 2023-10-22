@@ -51,7 +51,9 @@ fun HomeNavHost(
     val listState = rememberLazyListState()
 
     val expandedFab by remember {
-        derivedStateOf { listState.isScrollInProgress.not() }
+        derivedStateOf {
+            listState.firstVisibleItemIndex == 0
+        }
     }
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -76,24 +78,18 @@ fun HomeNavHost(
                     HomeAppBar(scrollBehavior)
                 } else {
                     DefaultAppBar(
-                        title = stringResource(id = homeViewModel.getAppBarTitle()),
+                        title = stringResource(homeViewModel.getAppBarTitle()),
                         onBack = { navController.popBackStack() }
                     )
                 }
             }
-
-//                fazer cross fade com appbar "voltar" aqui e tirar lá de content
-//
-//                depois fazer bottom sumir na tela de content
-//            }
         },
         floatingActionButton = {
             if (state.showEmailsList) {
-                HomeFAB(expanded = expandedFab)
+                HomeFAB(expandedFab)
             }
         },
         bottomBar = {
-//            if (currentDestination?.route != contentEmailFullPath) {
             AnimatedVisibility(
                 visible = currentDestination?.route != contentEmailFullPath,
                 enter = slideInVertically(
@@ -112,7 +108,6 @@ fun HomeNavHost(
                     }
                 )
             }
-//            }
         },
     ) { paddingValues ->
         Column(
@@ -122,19 +117,18 @@ fun HomeNavHost(
             NavHost(
                 navController = navController,
                 startDestination = emailListRoute,
-//                startDestination = translateSettingsRoute,
                 modifier = modifier,
-                enterTransition = { fadeIn(animationSpec = tween(200)) },
-                exitTransition = { fadeOut(animationSpec = tween(200)) },
-                popEnterTransition = { fadeIn(animationSpec = tween(200)) },
-                popExitTransition = { fadeOut(animationSpec = tween(200)) },
+                enterTransition = { fadeIn(tween(200)) },
+                exitTransition = { fadeOut(tween(200)) },
+                popEnterTransition = { fadeIn(tween(200)) },
+                popExitTransition = { fadeOut(tween(200)) },
             ) {
                 emailsListScreen(
+                    listState = listState,
                     onOpenEmail = { email ->
                         navController.navigateToContentEmailScreen(email.id)
                         homeViewModel.setSelectedEmail(email)
                     },
-                    listState = listState,
                 )
                 contentEmailScreen()
                 translateSettingsScreen()

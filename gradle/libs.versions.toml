@@ -1,6 +1,6 @@
 [versions]
 agp = "8.3.0-alpha07"
-kotlin = "1.9.0"
+kotlin = "1.9.10"
 core-ktx = "1.12.0"
 junit = "4.13.2"
 androidx-test-ext-junit = "1.1.5"
@@ -16,7 +16,7 @@ navigation-compose = "2.7.4"
 mlkit-translate = "17.0.1"
 mlkit-language-id = "17.0.4"
 
-ksp = "1.9.0-1.0.13"
+ksp = "1.9.10-1.0.13"
 dagger-compiler = "2.48"
 hilt-android = "2.48"
 hilt-navigation-compose = "1.0.0"

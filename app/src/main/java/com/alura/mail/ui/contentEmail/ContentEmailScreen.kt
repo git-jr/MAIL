@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -49,8 +50,11 @@ fun ContentEmailScreen() {
     val state by viewModel.uiState.collectAsState()
 
     state.selectedEmail?.let { email ->
-        val textTranslateFor =
-            "Traduzir do ${state.languageIdentified?.name} para ${state.localLanguage?.name}"
+        val textTranslateFor = stringResource(
+            R.string.traduzir_do_para,
+            state.languageIdentified?.name.toString(),
+            state.localLanguage?.name.toString()
+        )
 
         Column(
             Modifier
@@ -80,15 +84,15 @@ fun ContentEmailScreen() {
         if (state.showDownloadLanguageDialog) {
             LanguageDialog(
                 title = "${state.languageIdentified?.name}",
-                description = "Para traduzir os e-mails recebidos para esse idioma mesmo sem conexão com a internet, faça o download do arquivo de tradução.",
-                confirmText = "Download",
+                description = stringResource(R.string.download_warning_emails),
+                confirmText = stringResource(R.string.baixar),
                 onConfirm = {
-                    viewModel.changeShowDownloadLanguageDialog(false)
                     viewModel.downloadLanguageModel()
+                    viewModel.showDownloadLanguageDialog(false)
                 },
                 onDismiss = {
-                    viewModel.changeShowDownloadLanguageDialog(false)
                     viewModel.setTranslateState(TranslatedState.NOT_TRANSLATED)
+                    viewModel.showDownloadLanguageDialog(false)
                 },
             )
         }
@@ -138,7 +142,7 @@ private fun EmailSubHeader(
                     )
                     if (translatedState == TranslatedState.TRANSLATED) {
                         Text(
-                            text = "Mostrar original",
+                            text = stringResource(R.string.show_original),
                             fontSize = MaterialTheme.typography.labelMedium.fontSize,
                             color = MaterialTheme.colorScheme.inverseOnSurface,
                             fontWeight = FontWeight.Bold
@@ -153,7 +157,7 @@ private fun EmailSubHeader(
             ) {
                 Icon(
                     imageVector = Icons.Outlined.Close,
-                    contentDescription = "Mais informações",
+                    contentDescription = "Esconder sugestão de tradução",
                     tint = Color.Gray,
                     modifier = Modifier.size(24.dp)
                 )

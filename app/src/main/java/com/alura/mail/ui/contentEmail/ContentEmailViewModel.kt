@@ -4,10 +4,10 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.alura.mail.dao.EmailDao
 import com.alura.mail.mlkit.DOWNLOAD_TAG
 import com.alura.mail.mlkit.TextTranslate
 import com.alura.mail.model.Language
+import com.alura.mail.samples.EmailDao
 import com.alura.mail.ui.navigation.emailIdArgument
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -60,7 +60,6 @@ class ContentEmailViewModel @Inject constructor(
                         languageIdentified = null,
                         canBeTranslate = false
                     )
-                    return@identifyLanguage
                 }
             )
         }
@@ -89,10 +88,10 @@ class ContentEmailViewModel @Inject constructor(
         textTranslate.downloadModel(
             languageCode,
             onSuccessful = {
-                Log.i(DOWNLOAD_TAG, "Modelo baixado com sucesso")
+                Log.i(DOWNLOAD_TAG, "Modelo padrão baixado com sucesso")
             },
             onFailure = {
-                Log.i(DOWNLOAD_TAG, "Falha ao baixar o modelo")
+                Log.i(DOWNLOAD_TAG, "Falha ao baixar o modelo padrão")
             }
         )
     }
@@ -111,7 +110,6 @@ class ContentEmailViewModel @Inject constructor(
     }
 
     fun tryTranslateEmail() {
-        // se já foi traduzido volta ao original
         if (_uiState.value.translatedState == TranslatedState.TRANSLATED) {
             _uiState.value.selectedEmail?.let { email ->
                 _uiState.value = _uiState.value.copy(
@@ -128,11 +126,9 @@ class ContentEmailViewModel @Inject constructor(
             textTranslate.verifyModelDownloaded(
                 languageIdentified,
                 onSuccessful = {
-                    Log.i(DOWNLOAD_TAG, "Modelo NECESSÁRIO já sponivel!!!!")
                     translateEmail()
                 },
                 onFailure = {
-                    Log.i(DOWNLOAD_TAG, "Model NÃO disponivel AINDA!!!!")
                     _uiState.value = _uiState.value.copy(
                         showDownloadLanguageDialog = true
                     )
@@ -194,20 +190,20 @@ class ContentEmailViewModel @Inject constructor(
     fun downloadLanguageModel() {
         val languageIdentified = _uiState.value.languageIdentified?.code ?: return
 
-        Log.i(DOWNLOAD_TAG, "Tentando baixar o modelo para o idioma $languageIdentified")
         textTranslate.downloadModel(
             languageIdentified,
             onSuccessful = {
-                Log.i(DOWNLOAD_TAG, "Modelo baixado com sucesso")
                 translateEmail()
             },
             onFailure = {
-                Log.i(DOWNLOAD_TAG, "Falha ao baixar o modelo")
+                _uiState.value = _uiState.value.copy(
+                    translatedState = TranslatedState.NOT_TRANSLATED
+                )
             }
         )
     }
 
-    fun changeShowDownloadLanguageDialog(show: Boolean) {
+    fun showDownloadLanguageDialog(show: Boolean) {
         _uiState.value = _uiState.value.copy(
             showDownloadLanguageDialog = show
         )

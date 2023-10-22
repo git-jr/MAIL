@@ -1,6 +1,6 @@
 package com.alura.mail.di
 
-import com.alura.mail.FileUtil
+import com.alura.mail.util.FileUtil
 import com.alura.mail.mlkit.TextTranslate
 import dagger.Module
 import dagger.Provides

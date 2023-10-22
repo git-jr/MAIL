@@ -12,10 +12,6 @@ data class TranslateSettingsUiState(
     val loadModelsState: AppState = AppState.Loading
 )
 
-data class LoadState(
-    val appState: AppState = AppState.Loading
-)
-
 sealed class AppState {
     data object Loading : AppState()
     data object Loaded : AppState()

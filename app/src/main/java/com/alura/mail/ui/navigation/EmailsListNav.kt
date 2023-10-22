@@ -14,11 +14,10 @@ fun NavGraphBuilder.emailsListScreen(
 ) {
     composable(emailListRoute) {
         EmailsListScreen(
+            listState = listState,
             onClick = {
                 onOpenEmail(it)
-            },
-            listState = listState
+            }
         )
     }
-
 }

@@ -1,7 +1,7 @@
 package com.alura.mail.di
 
 import android.content.Context
-import com.alura.mail.FileUtil
+import com.alura.mail.util.FileUtil
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

@@ -44,37 +44,7 @@ fun TranslateSettingsScreen(modifier: Modifier = Modifier) {
     val translateSettingsViewModel = hiltViewModel<TranslateSettingsViewModel>()
     val state by translateSettingsViewModel.uiState.collectAsState()
 
-    val lifecycleOwner = LocalLifecycleOwner.current
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_START) {
-                translateSettingsViewModel.loadLanguages()
-            } else if (event == Lifecycle.Event.ON_STOP) {
-                translateSettingsViewModel.cleanAllStates()
-            }
-        }
-
-        lifecycleOwner.lifecycle.addObserver(observer)
-
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
-    }
-
-
     when (state.loadModelsState) {
-        AppState.Loading -> {
-            LoadScreen()
-        }
-
-        AppState.Error -> {
-            Text(
-                text = "Nenhum idioma disponível",
-                modifier = Modifier.fillMaxSize(),
-                textAlign = TextAlign.Center
-            )
-        }
-
         AppState.Loaded -> {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -85,14 +55,14 @@ fun TranslateSettingsScreen(modifier: Modifier = Modifier) {
                     if (state.downloadedLanguageModels.isNotEmpty()) {
                         item {
                             Text(
-                                text = "Ao fazer o download de um idioma, você pode traduzir os e-mails recebidos para esse idioma mesmo sem conexão com a internet.",
+                                text = stringResource(R.string.download_warning_languages),
                                 fontSize = MaterialTheme.typography.bodyMedium.fontSize,
                                 modifier = modifier.padding(16.dp),
                             )
                         }
 
                         item {
-                            SeparatorLanguageItem("Download concluído")
+                            SeparatorLanguageItem(stringResource(R.string.download_completed))
                             state.downloadedLanguageModels.forEach { language ->
                                 LanguageItem(
                                     languageModel = language,
@@ -109,7 +79,7 @@ fun TranslateSettingsScreen(modifier: Modifier = Modifier) {
 
                     if (state.notDownloadedLanguageModels.isNotEmpty()) {
                         item {
-                            SeparatorLanguageItem("Toque para fazer o download")
+                            SeparatorLanguageItem(stringResource(R.string.tap_to_download))
                             state.notDownloadedLanguageModels.forEach { language ->
                                 LanguageItem(
                                     languageModel = language,
@@ -128,8 +98,8 @@ fun TranslateSettingsScreen(modifier: Modifier = Modifier) {
                 state.selectedLanguageModel?.let { selectedLanguage ->
                     LanguageDialog(
                         title = selectedLanguage.name,
-                        description = "Para traduzir os e-mails recebidos para esse idioma mesmo sem conexão com a internet, faça o download do arquivo de tradução.",
-                        confirmText = "Download",
+                        description = stringResource(R.string.download_warning_emails),
+                        confirmText = stringResource(R.string.baixar),
                         onDismiss = {
                             translateSettingsViewModel.showDownloadDialog(false)
                         },
@@ -146,8 +116,8 @@ fun TranslateSettingsScreen(modifier: Modifier = Modifier) {
                 state.selectedLanguageModel?.let { selectedLanguage ->
                     LanguageDialog(
                         title = "${selectedLanguage.name} (${selectedLanguage.size})",
-                        description = "Se você remover este arquivo de tradução, não poderá traduzir os e-mails recebidos para esse idioma até fazer o download novamente.",
-                        confirmText = "Remover",
+                        description = stringResource(R.string.delete_warning),
+                        confirmText = stringResource(R.string.remover),
                         onDismiss = {
                             translateSettingsViewModel.showDeleteDialog(false)
                         },
@@ -158,10 +128,48 @@ fun TranslateSettingsScreen(modifier: Modifier = Modifier) {
                     )
                 }
             }
+        }
 
+        AppState.Loading -> {
+            LoadScreen()
+        }
+
+        AppState.Error -> {
+            EmptyScreen()
         }
     }
 
+    SetupDisposableEffect(translateSettingsViewModel)
+
+}
+
+@Composable
+private fun SetupDisposableEffect(translateSettingsViewModel: TranslateSettingsViewModel) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_START) {
+                translateSettingsViewModel.loadLanguages()
+            } else if (event == Lifecycle.Event.ON_STOP) {
+                translateSettingsViewModel.cleanState()
+            }
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+}
+
+@Composable
+private fun EmptyScreen() {
+    Text(
+        text = stringResource(R.string.no_languages_available),
+        modifier = Modifier.fillMaxSize(),
+        textAlign = TextAlign.Center
+    )
 }
 
 @Composable
@@ -201,7 +209,6 @@ private fun LanguageItem(
         )
     }
 }
-
 
 @Composable
 fun LanguageDialog(
@@ -286,7 +293,7 @@ private fun getIconByLanguage(languageModel: LanguageModel) = when (languageMode
 @Composable
 private fun getDescriptionByLanguage(languageModel: LanguageModel) =
     when (languageModel.downloadState) {
-        DownloadState.DOWNLOADED -> stringResource(R.string.idioma_baixado)
-        DownloadState.DOWNLOADING -> stringResource(R.string.baixando_idioma)
-        DownloadState.NOT_DOWNLOADED -> stringResource(R.string.toque_para_fazer_o_download)
+        DownloadState.DOWNLOADED -> stringResource(R.string.downloaded_language)
+        DownloadState.DOWNLOADING -> stringResource(R.string.downloading_language)
+        DownloadState.NOT_DOWNLOADED -> stringResource(R.string.tap_to_download)
     }

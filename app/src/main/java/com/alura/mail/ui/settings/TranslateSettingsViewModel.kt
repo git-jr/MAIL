@@ -10,7 +10,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
@@ -81,16 +80,6 @@ class TranslateSettingsViewModel @Inject constructor(
         )
     }
 
-    private fun updateLanguages(languageModels: List<LanguageModel>) {
-        val sortedLanguageModels = languageModels.sortedBy { it.name }
-        _uiState.value = _uiState.value.copy(
-            allLanguageModels = sortedLanguageModels,
-            downloadedLanguageModels = sortedLanguageModels.filter { it.downloadState == DownloadState.DOWNLOADED },
-            notDownloadedLanguageModels = sortedLanguageModels.filter { it.downloadState == DownloadState.NOT_DOWNLOADED || it.downloadState == DownloadState.DOWNLOADING },
-            loadModelsState = AppState.Loaded
-        )
-    }
-
     fun selectedLanguage(languageModel: LanguageModel) {
         _uiState.value = _uiState.value.copy(
             selectedLanguageModel = languageModel
@@ -128,56 +117,12 @@ class TranslateSettingsViewModel @Inject constructor(
         )
     }
 
-    private fun loadLanguagesOld() {
-
-        val languageModels = listOf(
-            LanguageModel(
-                id = UUID.randomUUID().toString(),
-                name = "Português",
-                downloadState = DownloadState.DOWNLOADED,
-                size = "81 MB"
-            ),
-            LanguageModel(
-                id = UUID.randomUUID().toString(),
-                name = "Inglês",
-                downloadState = DownloadState.DOWNLOADED,
-                size = "82 MB"
-            ),
-            LanguageModel(
-                id = UUID.randomUUID().toString(),
-                name = "Espanhol",
-                downloadState = DownloadState.NOT_DOWNLOADED,
-                size = "83 MB"
-            ),
-            LanguageModel(
-                id = UUID.randomUUID().toString(),
-                name = "Francês",
-                downloadState = DownloadState.NOT_DOWNLOADED,
-                size = "78 MB"
-            ),
-            LanguageModel(
-                id = UUID.randomUUID().toString(),
-                name = "Alemão",
-                downloadState = DownloadState.DOWNLOADED,
-                size = "79 MB"
-            ),
-            LanguageModel(
-                id = UUID.randomUUID().toString(),
-                name = "Italiano",
-                downloadState = DownloadState.NOT_DOWNLOADED,
-                size = "56 MB"
-            ),
-        )
-
-        updateLanguages(languageModels)
-    }
-
-    fun onDispose() {
-//        textTranslate.close()
-    }
-
-    fun cleanAllStates() {
+    fun cleanState() {
         _uiState.value = TranslateSettingsUiState()
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        _uiState.value = TranslateSettingsUiState()
+    }
 }

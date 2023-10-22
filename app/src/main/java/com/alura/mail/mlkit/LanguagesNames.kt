@@ -1,7 +1,6 @@
 package com.alura.mail.mlkit
 
-// Lista com todos apenas os modelos de idiomas que podem ser identificados E traduzidos
-val languagesNames = mapOf(
+val translatableLanguageModels = mapOf(
     "af" to "africâner",
     "ar" to "árabe",
     "be" to "bielorrusso",
@@ -64,9 +63,7 @@ val languagesNames = mapOf(
     "zh" to "chinês",
 )
 
-
-// Lista com todos os modelos que podem ser indentificados
-val completelanguagesNames = mapOf(
+val identifiableLanguageModels = mapOf(
     "af" to "africâner",
     "sou" to "amárico",
     "ar" to "árabe",
