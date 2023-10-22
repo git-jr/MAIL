@@ -3,6 +3,7 @@ package com.alura.mail.ui.settings
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -165,11 +166,15 @@ private fun SetupDisposableEffect(translateSettingsViewModel: TranslateSettingsV
 
 @Composable
 private fun EmptyScreen() {
-    Text(
-        text = stringResource(R.string.no_languages_available),
+    Box(
         modifier = Modifier.fillMaxSize(),
-        textAlign = TextAlign.Center
-    )
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = stringResource(R.string.no_languages_available),
+            textAlign = TextAlign.Center,
+        )
+    }
 }
 
 @Composable

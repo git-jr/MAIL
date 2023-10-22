@@ -21,20 +21,38 @@ class TranslateSettingsViewModel @Inject constructor(
     var uiState = _uiState.asStateFlow()
 
     init {
+        loadLanguages()
+    }
+
+
+    internal fun loadLanguages() {
         viewModelScope.launch {
-            delay(1000)
-            loadLanguages()
+            delay(3000)
+            _uiState.value = _uiState.value.copy(
+                allLanguageModels = textTranslate.getAllModels().sortedBy { it.name }
+            )
+            updateLanguagesState()
+            loadDownloadedLanguages()
         }
     }
 
-    internal fun loadLanguages() {
+    private fun updateLanguagesState() {
+        val allModels = _uiState.value.allLanguageModels
+        val notDownloadedModels = filterAllModelNotDownloaded()
+
         _uiState.value = _uiState.value.copy(
-            allLanguageModels = textTranslate.getAllModels().sortedBy { it.name }
+            notDownloadedLanguageModels = notDownloadedModels,
+            loadModelsState = if (allModels.isNotEmpty() || notDownloadedModels.isNotEmpty()) {
+                AppState.Loaded
+            } else {
+                AppState.Error
+            }
         )
-        loadDownloadedLanguages()
     }
 
-    private fun filterAllModelNotDownloaded(downloadedModels: List<LanguageModel>): List<LanguageModel> {
+    private fun filterAllModelNotDownloaded(): List<LanguageModel> {
+        val downloadedModels = _uiState.value.downloadedLanguageModels
+
         return _uiState.value.allLanguageModels.filter { languageModel ->
             downloadedModels.none { it.id == languageModel.id }
         }
@@ -45,14 +63,15 @@ class TranslateSettingsViewModel @Inject constructor(
             onSuccessful = { downloadedModels ->
                 if (downloadedModels.isNotEmpty()) {
                     _uiState.value = _uiState.value.copy(
-                        downloadedLanguageModels = downloadedModels.sortedBy { it.name },
-                        notDownloadedLanguageModels = filterAllModelNotDownloaded(downloadedModels),
-                        loadModelsState = AppState.Loaded
+                        downloadedLanguageModels = downloadedModels.sortedBy { it.name }
                     )
+                    updateLanguagesState()
                 } else {
-                    _uiState.value = _uiState.value.copy(
-                        loadModelsState = AppState.Error
-                    )
+                    if (_uiState.value.allLanguageModels.isEmpty()) {
+                        _uiState.value = _uiState.value.copy(
+                            loadModelsState = AppState.Error
+                        )
+                    }
                 }
             }
         )
@@ -112,17 +131,11 @@ class TranslateSettingsViewModel @Inject constructor(
             onSuccessful = {
                 loadLanguages()
             },
-            onFailure = {
-            }
+            onFailure = {}
         )
     }
 
     fun cleanState() {
-        _uiState.value = TranslateSettingsUiState()
-    }
-
-    override fun onCleared() {
-        super.onCleared()
         _uiState.value = TranslateSettingsUiState()
     }
 }

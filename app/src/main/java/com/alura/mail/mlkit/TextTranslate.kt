@@ -1,10 +1,10 @@
 package com.alura.mail.mlkit
 
 import android.util.Log
-import com.alura.mail.util.FileUtil
 import com.alura.mail.model.DownloadState
 import com.alura.mail.model.Language
 import com.alura.mail.model.LanguageModel
+import com.alura.mail.util.FileUtil
 import com.google.mlkit.common.model.DownloadConditions
 import com.google.mlkit.common.model.RemoteModelManager
 import com.google.mlkit.nl.languageid.LanguageIdentification

@@ -16,6 +16,6 @@
     <string name="write">Escrever</string>
     <string name="traduzir_do_para">Traduzir do %1$s para %2$s</string>
     <string name="show_original">Mostrar original</string>
-    <string name="no_languages_available">Nenhum idioma disponível</string>
+    <string name="no_languages_available">Nenhum idioma disponível ainda</string>
 
 </resources>

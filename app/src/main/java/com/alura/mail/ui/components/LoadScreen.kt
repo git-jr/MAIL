@@ -36,10 +36,10 @@ fun LoadScreen() {
         Box(
             contentAlignment = Alignment.Center
         ) {
-            var mPosition by remember { mutableIntStateOf(0) }
-            var aPosition by remember { mutableIntStateOf(1) }
-            var lPosition by remember { mutableIntStateOf(2) }
-            var iPosition by remember { mutableIntStateOf(3) }
+            var mPosition by remember { mutableIntStateOf(3) }
+            var aPosition by remember { mutableIntStateOf(2) }
+            var lPosition by remember { mutableIntStateOf(1) }
+            var iPosition by remember { mutableIntStateOf(0) }
 
             val mPositionAnimated = animateIntOffsetAsState(
                 targetValue = getNextOffset(mPosition),
