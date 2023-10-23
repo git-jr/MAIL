@@ -34,8 +34,8 @@ class TextTranslate(private val fileUtil: FileUtil) {
 
         val translator = Translation.getClient(options)
 
-        with(translator) {
-            translate(text)
+        translator.use {
+            it.translate(text)
                 .addOnSuccessListener { translatedText ->
                     onSuccessful(translatedText)
                 }
@@ -43,7 +43,6 @@ class TextTranslate(private val fileUtil: FileUtil) {
                     onFailure()
                 }
         }
-
     }
 
     fun verifyModelDownloaded(
@@ -141,6 +140,18 @@ class TextTranslate(private val fileUtil: FileUtil) {
                         )
                     } catch (e: Exception) {
                         Log.e(DOWNLOAD_TAG, "Error: $e")
+                        if (model.language == TranslateLanguage.ENGLISH) {
+                            Log.e(DOWNLOAD_TAG, "Ingles detectado ${model.language}")
+                            languageModels.add(
+                                LanguageModel(
+                                    id = model.language,
+                                    name = translatableLanguageModels[model.language]
+                                        ?: model.language,
+                                    downloadState = DownloadState.DOWNLOADED,
+                                    size = ""
+                                )
+                            )
+                        }
                     }
                 }
                 onSuccessful(languageModels)
@@ -156,6 +167,8 @@ class TextTranslate(private val fileUtil: FileUtil) {
         val languageModels = mutableListOf<LanguageModel>()
 
         TranslateLanguage.getAllLanguages().forEach {
+            // log codigos de linguagem
+            Log.i("DOWNLOAD_TAG", "Language: $it")
             languageModels.add(
                 LanguageModel(
                     id = it,
