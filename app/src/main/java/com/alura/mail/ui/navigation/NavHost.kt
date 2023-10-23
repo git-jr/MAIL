@@ -1,4 +1,4 @@
-package com.alura.mail.ui.home
+package com.alura.mail.ui.navigation
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
@@ -31,12 +31,7 @@ import com.alura.mail.ui.components.DefaultAppBar
 import com.alura.mail.ui.components.HomeAppBar
 import com.alura.mail.ui.components.HomeBottomBar
 import com.alura.mail.ui.components.HomeFAB
-import com.alura.mail.ui.navigation.contentEmailFullPath
-import com.alura.mail.ui.navigation.contentEmailScreen
-import com.alura.mail.ui.navigation.emailListRoute
-import com.alura.mail.ui.navigation.emailsListScreen
-import com.alura.mail.ui.navigation.navigateToContentEmailScreen
-import com.alura.mail.ui.navigation.translateSettingsScreen
+import com.alura.mail.ui.home.HomeViewModel
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)

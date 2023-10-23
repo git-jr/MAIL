@@ -2,7 +2,7 @@ package com.alura.mail.ui.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.alura.mail.mlkit.TextTranslate
+import com.alura.mail.mlkit.TextTranslator
 import com.alura.mail.model.DownloadState
 import com.alura.mail.model.LanguageModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TranslateSettingsViewModel @Inject constructor(
-    private val textTranslate: TextTranslate
+    private val textTranslator: TextTranslator
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(TranslateSettingsUiState())
@@ -29,7 +29,6 @@ class TranslateSettingsViewModel @Inject constructor(
         viewModelScope.launch {
             delay(3000)
             _uiState.value = _uiState.value.copy(
-                allLanguageModels = textTranslate.getAllModels().sortedBy { it.name }
             )
             updateLanguagesState()
             loadDownloadedLanguages()
@@ -59,22 +58,6 @@ class TranslateSettingsViewModel @Inject constructor(
     }
 
     private fun loadDownloadedLanguages() {
-        textTranslate.getDownloadedModels(
-            onSuccessful = { downloadedModels ->
-                if (downloadedModels.isNotEmpty()) {
-                    _uiState.value = _uiState.value.copy(
-                        downloadedLanguageModels = downloadedModels.sortedBy { it.name }
-                    )
-                    updateLanguagesState()
-                } else {
-                    if (_uiState.value.allLanguageModels.isEmpty()) {
-                        _uiState.value = _uiState.value.copy(
-                            loadModelsState = AppState.Error
-                        )
-                    }
-                }
-            }
-        )
     }
 
     fun showDownloadDialog(show: Boolean) {
@@ -110,29 +93,9 @@ class TranslateSettingsViewModel @Inject constructor(
             languageModel = languageModel,
             downloadState = DownloadState.DOWNLOADING
         )
-
-        textTranslate.downloadModel(
-            targetLanguage = languageModel.id,
-            onSuccessful = {
-                loadLanguages()
-            },
-            onFailure = {
-                updateDownloadState(
-                    languageModel = languageModel,
-                    downloadState = DownloadState.NOT_DOWNLOADED
-                )
-            }
-        )
     }
 
     fun removeLanguage(languageModel: LanguageModel) {
-        textTranslate.removeModel(
-            targetLanguage = languageModel.id,
-            onSuccessful = {
-                loadLanguages()
-            },
-            onFailure = {}
-        )
     }
 
     fun cleanState() {

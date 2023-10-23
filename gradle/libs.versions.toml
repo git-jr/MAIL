@@ -7,19 +7,18 @@ androidx-test-ext-junit = "1.1.5"
 espresso-core = "3.5.1"
 lifecycle-runtime-ktx = "2.6.2"
 activity-compose = "1.8.0"
-compose-bom = "2023.10.00"
+compose-bom = "2023.10.01"
 viewmodel-compose = "2.6.2"
 
 kotlinx-datetime = "0.4.1"
 navigation-compose = "2.7.4"
 
-mlkit-translate = "17.0.1"
-mlkit-language-id = "17.0.4"
-
 ksp = "1.9.10-1.0.13"
 dagger-compiler = "2.48"
 hilt-android = "2.48"
 hilt-navigation-compose = "1.0.0"
+
+
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -41,13 +40,11 @@ ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 material3 = { group = "androidx.compose.material3", name = "material3" }
 
-mlkit-language = { module = "com.google.mlkit:language-id", version.ref = "mlkit-language-id" }
-mlkit-translate = { module = "com.google.mlkit:translate", version.ref = "mlkit-translate" }
-
 dagger-compiler = { module = "com.google.dagger:dagger-compiler", version.ref = "dagger-compiler" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt-android" }
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "dagger-compiler" }
 hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hilt-navigation-compose" }
+
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

@@ -51,7 +51,7 @@ fun ContentEmailScreen() {
 
     state.selectedEmail?.let { email ->
         val textTranslateFor = stringResource(
-            R.string.traduzir_do_para,
+            R.string.translate_from_to,
             state.languageIdentified?.name.toString(),
             state.localLanguage?.name.toString()
         )

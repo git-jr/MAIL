@@ -1,7 +1,7 @@
 package com.alura.mail.di
 
+import com.alura.mail.mlkit.TextTranslator
 import com.alura.mail.util.FileUtil
-import com.alura.mail.mlkit.TextTranslate
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -9,9 +9,9 @@ import dagger.hilt.components.SingletonComponent
 
 @Module
 @InstallIn(SingletonComponent::class)
-class TextTranslateModule {
+class TextTranslatorModule {
     @Provides
-    fun provideTextTranslate(fileUtil: FileUtil): TextTranslate {
-        return TextTranslate(fileUtil)
+    fun provideTextTranslator(fileUtil: FileUtil): TextTranslator {
+        return TextTranslator(fileUtil)
     }
 }

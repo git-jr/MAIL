@@ -4,7 +4,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.alura.mail.ui.contentEmail.ContentEmailScreen
-import com.alura.mail.ui.home.navigateDirect
 
 internal const val contentEmailRoute = "emails"
 internal const val emailIdArgument = "emailId"

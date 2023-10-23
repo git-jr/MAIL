@@ -8,7 +8,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
-import com.alura.mail.ui.home.HomeNavHost
+import com.alura.mail.ui.navigation.HomeNavHost
 import com.alura.mail.ui.theme.MAILTheme
 import dagger.hilt.android.AndroidEntryPoint
 

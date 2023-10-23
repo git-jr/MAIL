@@ -64,6 +64,7 @@ dependencies {
     implementation(libs.material3)
 
     implementation(libs.viewmodel.compose)
+    implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.datetime)
 
     testImplementation(libs.junit)
@@ -74,14 +75,9 @@ dependencies {
     debugImplementation(libs.ui.tooling)
     debugImplementation(libs.ui.test.manifest)
 
-    implementation(libs.androidx.navigation.compose)
-
-    implementation(libs.mlkit.language)
-    implementation(libs.mlkit.translate)
-
     implementation(libs.hilt.android)
     implementation(libs.hilt.navigation.compose)
     ksp (libs.dagger.compiler)
     ksp (libs.hilt.compiler)
-
+    
 }

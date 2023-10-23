@@ -15,6 +15,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import com.alura.mail.R
 import com.alura.mail.ui.navigation.emailListRoute
 import com.alura.mail.ui.navigation.translateSettingsRoute
 
@@ -34,10 +36,10 @@ fun HomeBottomBar(
                     icon = {
                         Icon(
                             if (currentTab == item.route) item.resourceId.first else item.resourceId.second,
-                            contentDescription = item.title,
+                            contentDescription = stringResource(item.title),
                         )
                     },
-                    label = { Text(item.title) },
+                    label = { Text(stringResource(item.title)) },
                     selected = currentTab == item.route,
                     onClick = { onItemSelected(item.route) },
                     colors = NavigationBarItemDefaults.colors(
@@ -55,7 +57,7 @@ fun HomeBottomBar(
 
 private val screenItems = listOf(
     BottomScreenItem(
-        title = "Início",
+        title = R.string.bottom_title_home,
         route = emailListRoute,
         resourceId = Pair(
             Icons.Filled.Home,
@@ -63,7 +65,7 @@ private val screenItems = listOf(
         ),
     ),
     BottomScreenItem(
-        title = "Ajustes",
+        title = R.string.bottom_title_settings,
         route = translateSettingsRoute,
         resourceId = Pair(
             Icons.Filled.Settings,
@@ -73,7 +75,7 @@ private val screenItems = listOf(
 )
 
 private data class BottomScreenItem(
-    val title: String,
+    val title: Int,
     val route: String,
     val resourceId: Pair<ImageVector, ImageVector>,
 )
