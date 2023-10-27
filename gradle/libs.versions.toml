@@ -18,7 +18,7 @@ dagger-compiler = "2.48"
 hilt-android = "2.48"
 hilt-navigation-compose = "1.0.0"
 
-
+language-id = "17.0.4"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -44,6 +44,8 @@ dagger-compiler = { module = "com.google.dagger:dagger-compiler", version.ref = 
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt-android" }
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "dagger-compiler" }
 hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hilt-navigation-compose" }
+
+language-id = { module = "com.google.mlkit:language-id", version.ref = "language-id" }
 
 
 [plugins]
