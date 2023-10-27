@@ -28,39 +28,11 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val navController = rememberNavController()
                     HomeNavHost(navController = navController)
-
-//                    val text = "Hello Mundo buenos dias!"
-                    val text = "bom dia"
-
-                    languageIdentifier(text,
-                        onSuccess = {
-                            Log.i("languageIdentifier", "Language: $it")
-                        }, onFailure = {
-                            Log.e("languageIdentifier", "falha ao traduzir idioma")
-                        }
-                    )
                 }
             }
         }
     }
 
 
-    fun languageIdentifier(
-        text: String,
-        onSuccess: (String) -> Unit,
-        onFailure: () -> Unit
-    ) {
-        val languageIdentifier = LanguageIdentification.getClient()
-        languageIdentifier.identifyLanguage(text)
-            .addOnSuccessListener { languageCode ->
-                Log.i("Language", languageCode)
-                val languageName =
-                    translatableLanguageModels[languageCode] ?: UNDETERMINED_LANGUAGE_TAG
-                onSuccess(languageName)
-            }.addOnFailureListener {
-                Log.e("Language", "Error", it)
-                onFailure()
-            }
-    }
 }
 

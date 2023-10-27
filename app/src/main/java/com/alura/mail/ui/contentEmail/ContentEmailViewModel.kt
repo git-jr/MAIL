@@ -1,5 +1,6 @@
 package com.alura.mail.ui.contentEmail
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -45,12 +46,31 @@ class ContentEmailViewModel @Inject constructor(
 
     private fun identifyEmailLanguage() {
         _uiState.value.selectedEmail?.let { email ->
+            textTranslator.languageIdentifier(
+                email.content,
+                onSuccess = { language ->
+                    _uiState.value = _uiState.value.copy(
+                        languageIdentified = language,
+                    )
+                    verifyIfNeedTranslate()
+                },
+                onFailure = {
+                    _uiState.value = _uiState.value.copy(
+                        languageIdentified = null,
+                        canBeTranslate = false
+                    )
+                    verifyIfNeedTranslate()
+                }
+            )
         }
     }
 
     private fun identifyLocalLanguage() {
         val languageCode = Locale.getDefault().language
         val languageName = Locale.getDefault().displayLanguage
+
+        Log.i("identifyLocalLanguage", "languageCode: $languageCode")
+        Log.i("identifyLocalLanguage", "languageName: $languageName")
 
         _uiState.value = _uiState.value.copy(
             localLanguage = Language(
