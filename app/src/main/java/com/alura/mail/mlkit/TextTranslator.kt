@@ -3,6 +3,7 @@ package com.alura.mail.mlkit
 import android.util.Log
 import com.alura.mail.model.Language
 import com.alura.mail.util.FileUtil
+import com.google.mlkit.common.model.DownloadConditions
 import com.google.mlkit.common.model.RemoteModelManager
 import com.google.mlkit.nl.languageid.LanguageIdentification
 import com.google.mlkit.nl.languageid.LanguageIdentifier
@@ -81,7 +82,30 @@ class TextTranslator(private val fileUtil: FileUtil) {
             .addOnFailureListener {
                 onFailure()
             }
-
     }
+
+    fun downloadModel(
+        languageModel: String,
+        onSuccess: () -> Unit = {},
+        onFailure: () -> Unit = {}
+    ) {
+        val localLanguageModel = TranslateRemoteModel.Builder(languageModel).build()
+
+        val conditions = DownloadConditions.Builder()
+            .requireWifi()
+            .build()
+        val modelManager = RemoteModelManager.getInstance()
+
+        modelManager.download(localLanguageModel, conditions)
+            .addOnSuccessListener {
+                Log.i("modelManager", "Modelo padrão baixado com sucesso")
+                onSuccess()
+            }
+            .addOnFailureListener {
+                Log.e("modelManager", "Erro ao baixar modelo padrão", it)
+                onFailure()
+            }
+    }
+
 }
 

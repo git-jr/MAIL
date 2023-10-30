@@ -87,20 +87,7 @@ class ContentEmailViewModel @Inject constructor(
 
     private fun downloadDefaultLanguageModel() {
         val localLanguage = Locale.getDefault().language
-        val localLanguageModel = TranslateRemoteModel.Builder(localLanguage).build()
-
-        val conditions = DownloadConditions.Builder()
-            .requireWifi()
-            .build()
-        val modelManager = RemoteModelManager.getInstance()
-
-        modelManager.download(localLanguageModel, conditions)
-            .addOnSuccessListener {
-                Log.i("modelManager", "Modelo padrão baixado com sucesso")
-            }
-            .addOnFailureListener {
-                Log.e("modelManager", "Erro ao baixar modelo padrão", it)
-            }
+        textTranslator.downloadModel(localLanguage)
     }
 
     private fun verifyIfNeedTranslate() {
@@ -130,6 +117,19 @@ class ContentEmailViewModel @Inject constructor(
                 }
             } else {
                 setTranslateState(TranslatedState.TRANSLATING)
+                val languageIdentified = _uiState.value.languageIdentified?.code.toString()
+
+                textTranslator.verifyModelDownloaded(
+                    languageIdentified,
+                    onSuccess = {
+                        translateEmail()
+                    },
+                    onFailure = {
+                        _uiState.value = _uiState.value.copy(
+                            showDownloadLanguageDialog = true
+                        )
+                    }
+                )
             }
         }
     }
@@ -164,6 +164,17 @@ class ContentEmailViewModel @Inject constructor(
 
     fun downloadLanguageModel() {
         val languageIdentified = _uiState.value.languageIdentified?.code ?: return
+        textTranslator.downloadModel(
+            languageIdentified,
+            onSuccess = {
+                translateEmail()
+            },
+            onFailure = {
+                _uiState.value = _uiState.value.copy(
+                    translatedState = TranslatedState.NOT_TRANSLATED
+                )
+            }
+        )
     }
 
     fun showDownloadLanguageDialog(show: Boolean) {

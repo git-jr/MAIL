@@ -224,7 +224,7 @@ fun LanguageDialog(
     confirmText: String,
 ) {
     Dialog(
-        onDismissRequest = { onDismiss() }
+        onDismissRequest = { onDismiss() },
     ) {
         Surface(
             shape = MaterialTheme.shapes.extraLarge
