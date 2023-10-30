@@ -8,6 +8,9 @@ import com.alura.mail.mlkit.TextTranslator
 import com.alura.mail.model.Language
 import com.alura.mail.samples.EmailDao
 import com.alura.mail.ui.navigation.emailIdArgument
+import com.google.mlkit.common.model.DownloadConditions
+import com.google.mlkit.common.model.RemoteModelManager
+import com.google.mlkit.nl.translate.TranslateRemoteModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -83,6 +86,21 @@ class ContentEmailViewModel @Inject constructor(
     }
 
     private fun downloadDefaultLanguageModel() {
+        val localLanguage = Locale.getDefault().language
+        val localLanguageModel = TranslateRemoteModel.Builder(localLanguage).build()
+
+        val conditions = DownloadConditions.Builder()
+            .requireWifi()
+            .build()
+        val modelManager = RemoteModelManager.getInstance()
+
+        modelManager.download(localLanguageModel, conditions)
+            .addOnSuccessListener {
+                Log.i("modelManager", "Modelo padrão baixado com sucesso")
+            }
+            .addOnFailureListener {
+                Log.e("modelManager", "Erro ao baixar modelo padrão", it)
+            }
     }
 
     private fun verifyIfNeedTranslate() {
