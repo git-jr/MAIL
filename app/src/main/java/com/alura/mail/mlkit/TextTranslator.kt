@@ -3,9 +3,10 @@ package com.alura.mail.mlkit
 import android.util.Log
 import com.alura.mail.model.Language
 import com.alura.mail.util.FileUtil
+import com.google.mlkit.common.model.RemoteModelManager
 import com.google.mlkit.nl.languageid.LanguageIdentification
 import com.google.mlkit.nl.languageid.LanguageIdentifier
-import com.google.mlkit.nl.translate.TranslateLanguage
+import com.google.mlkit.nl.translate.TranslateRemoteModel
 import com.google.mlkit.nl.translate.Translation
 import com.google.mlkit.nl.translate.TranslatorOptions
 
@@ -59,6 +60,28 @@ class TextTranslator(private val fileUtil: FileUtil) {
                 Log.e("translator", exception.toString())
                 onFailure()
             }
+    }
+
+
+    fun verifyModelDownloaded(
+        targetLanguage: String,
+        onSuccess: () -> Unit = {},
+        onFailure: () -> Unit = {}
+    ) {
+        val modelManager = RemoteModelManager.getInstance()
+
+        modelManager.getDownloadedModels(TranslateRemoteModel::class.java)
+            .addOnSuccessListener { models ->
+                if (models.any { it.language == targetLanguage }) {
+                    onSuccess()
+                } else {
+                    onFailure()
+                }
+            }
+            .addOnFailureListener {
+                onFailure()
+            }
+
     }
 }
 

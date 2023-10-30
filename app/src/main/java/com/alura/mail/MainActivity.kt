@@ -33,15 +33,29 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     HomeNavHost(navController = navController)
 
-                    TextTranslator(FileUtil(this)).textTranslate(
-                        text = "Uma arquitethura separada",
-                        sourceLanguage = TranslateLanguage.PORTUGUESE,
-                        targetLanguage = TranslateLanguage.ENGLISH,
-                        onSuccess = { translatedText ->
-                            Log.i("translator main", translatedText)
+                    val text = "Good Morning"
+                    val textTranslator = TextTranslator(FileUtil(this))
+
+                    textTranslator.languageIdentifier(
+                        text = text,
+                        onSuccess = { language ->
+                            textTranslator.verifyModelDownloaded(
+                                language.code,
+                                onSuccess = {
+                                    Log.i(
+                                        "Language model",
+                                        "Modelo para ${language.name} disponivel"
+                                    )
+                                },
+                                onFailure = {
+                                    Log.i(
+                                        "Language model",
+                                        "Modelo para ${language.name} ainda não disponivel"
+                                    )
+                                })
                         },
                         onFailure = {
-                            Log.e("translator main", "Error")
+                            Log.e("Language main", "Error")
                         }
                     )
                 }
@@ -49,3 +63,4 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
