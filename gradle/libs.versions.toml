@@ -19,6 +19,7 @@ hilt-android = "2.48"
 hilt-navigation-compose = "1.0.0"
 
 language-id = "17.0.4"
+translate = "17.0.1"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -46,7 +47,7 @@ hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "dag
 hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hilt-navigation-compose" }
 
 language-id = { module = "com.google.mlkit:language-id", version.ref = "language-id" }
-
+translate = { module = "com.google.mlkit:translate", version.ref = "translate" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
