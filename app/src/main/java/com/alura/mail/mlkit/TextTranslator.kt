@@ -5,6 +5,9 @@ import com.alura.mail.model.Language
 import com.alura.mail.util.FileUtil
 import com.google.mlkit.nl.languageid.LanguageIdentification
 import com.google.mlkit.nl.languageid.LanguageIdentifier
+import com.google.mlkit.nl.translate.TranslateLanguage
+import com.google.mlkit.nl.translate.Translation
+import com.google.mlkit.nl.translate.TranslatorOptions
 
 
 class TextTranslator(private val fileUtil: FileUtil) {
@@ -32,6 +35,30 @@ class TextTranslator(private val fileUtil: FileUtil) {
                 onFailure()
             }
     }
-}
 
+
+    fun textTranslate(
+        text: String,
+        sourceLanguage: String,
+        targetLanguage: String,
+        onSuccess: (String) -> Unit,
+        onFailure: () -> Unit
+    ) {
+        val options = TranslatorOptions.Builder()
+            .setSourceLanguage(sourceLanguage)
+            .setTargetLanguage(targetLanguage)
+            .build()
+
+        val translator = Translation.getClient(options)
+        translator.translate(text)
+            .addOnSuccessListener { translatedText ->
+                Log.i("translator", translatedText)
+                onSuccess(translatedText)
+            }
+            .addOnFailureListener { exception ->
+                Log.e("translator", exception.toString())
+                onFailure()
+            }
+    }
+}
 
