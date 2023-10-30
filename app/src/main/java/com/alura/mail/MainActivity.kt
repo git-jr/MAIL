@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.alura.mail.ui.navigation.HomeNavHost
 import com.alura.mail.ui.theme.MAILTheme
+import com.google.mlkit.common.model.DownloadConditions
 import com.google.mlkit.nl.translate.TranslateLanguage
 import com.google.mlkit.nl.translate.Translation
 import com.google.mlkit.nl.translate.TranslatorOptions
@@ -36,11 +37,22 @@ class MainActivity : ComponentActivity() {
                         .build()
                     val ptEnTranslator = Translation.getClient(options)
 
-                    ptEnTranslator.translate("Olá mundo!")
-                        .addOnSuccessListener { translatedText ->
-                            Log.i("ptEnTranslator", translatedText)
+                    val downloadManager = DownloadConditions.Builder()
+                        .requireWifi() // opcional
+                        .requireCharging() // opcional
+                        .build()
+
+                    ptEnTranslator.downloadModelIfNeeded(downloadManager)
+                        .addOnSuccessListener {
+                            Log.i("ptEnTranslator", "Modelo baixado com sucesso!")
+                            ptEnTranslator.translate("Bom dia, como vai você?")
+                                .addOnSuccessListener { translatedText ->
+                                    Log.i("ptEnTranslator", translatedText)
+                                }.addOnFailureListener { exception ->
+                                    Log.e("ptEnTranslator", exception.toString())
+                                }
                         }.addOnFailureListener { exception ->
-                            Log.e("ptEnTranslator", exception.toString())
+                            Log.e("ptEnTranslator", "Falhao ao baixa modelo $exception")
                         }
                 }
             }
