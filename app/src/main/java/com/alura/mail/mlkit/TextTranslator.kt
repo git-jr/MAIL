@@ -152,5 +152,25 @@ class TextTranslator(private val fileUtil: FileUtil) {
             }
     }
 
+    fun removeModel(
+        languageModel: String,
+        onSuccess: () -> Unit = {},
+        onFailure: () -> Unit = {}
+    ) {
+        val localLanguageModel = TranslateRemoteModel.Builder(languageModel).build()
+
+        val modelManager = RemoteModelManager.getInstance()
+
+        modelManager.deleteDownloadedModel(localLanguageModel)
+            .addOnSuccessListener {
+                Log.i("modelManager", "Modelo removido com sucesso")
+                onSuccess()
+            }
+            .addOnFailureListener {
+                Log.e("modelManager", "Erro ao remover modelo", it)
+                onFailure()
+            }
+    }
+
 }
 
