@@ -22,6 +22,7 @@ class TextTranslator(private val fileUtil: FileUtil) {
         onFailure: () -> Unit
     ) {
         val languageIdentifier = LanguageIdentification.getClient()
+
         languageIdentifier.identifyLanguage(text)
             .addOnSuccessListener { languageCode ->
                 Log.i("Language", languageCode)
@@ -39,6 +40,8 @@ class TextTranslator(private val fileUtil: FileUtil) {
                 Log.e("Language", "Error", it)
                 onFailure()
             }
+            .addOnCompleteListener { languageIdentifier.close() }
+
     }
 
 
@@ -64,6 +67,7 @@ class TextTranslator(private val fileUtil: FileUtil) {
                 Log.e("translator", exception.toString())
                 onFailure()
             }
+            .addOnCompleteListener { translator.close() }
     }
 
 
@@ -171,6 +175,4 @@ class TextTranslator(private val fileUtil: FileUtil) {
                 onFailure()
             }
     }
-
 }
-
