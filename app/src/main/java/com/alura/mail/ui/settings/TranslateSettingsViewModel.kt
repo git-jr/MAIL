@@ -29,6 +29,7 @@ class TranslateSettingsViewModel @Inject constructor(
         viewModelScope.launch {
             delay(3000)
             _uiState.value = _uiState.value.copy(
+                allLanguageModels = textTranslator.getAllLanguages(),
             )
             updateLanguagesState()
             loadDownloadedLanguages()
@@ -58,6 +59,22 @@ class TranslateSettingsViewModel @Inject constructor(
     }
 
     private fun loadDownloadedLanguages() {
+        textTranslator.getDownloadedModels(
+            onSuccess = { downloadedModels ->
+                if (downloadedModels.isNotEmpty()) {
+                    _uiState.value = _uiState.value.copy(
+                        downloadedLanguageModels = downloadedModels.sortedBy { it.name }
+                    )
+                    updateLanguagesState()
+                } else {
+                    if (_uiState.value.allLanguageModels.isEmpty()) {
+                        _uiState.value = _uiState.value.copy(
+                            loadModelsState = AppState.Error
+                        )
+                    }
+                }
+            }
+        )
     }
 
     fun showDownloadDialog(show: Boolean) {

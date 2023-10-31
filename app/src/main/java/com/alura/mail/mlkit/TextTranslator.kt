@@ -1,12 +1,15 @@
 package com.alura.mail.mlkit
 
 import android.util.Log
+import com.alura.mail.model.DownloadState
 import com.alura.mail.model.Language
+import com.alura.mail.model.LanguageModel
 import com.alura.mail.util.FileUtil
 import com.google.mlkit.common.model.DownloadConditions
 import com.google.mlkit.common.model.RemoteModelManager
 import com.google.mlkit.nl.languageid.LanguageIdentification
 import com.google.mlkit.nl.languageid.LanguageIdentifier
+import com.google.mlkit.nl.translate.TranslateLanguage
 import com.google.mlkit.nl.translate.TranslateRemoteModel
 import com.google.mlkit.nl.translate.Translation
 import com.google.mlkit.nl.translate.TranslatorOptions
@@ -103,6 +106,48 @@ class TextTranslator(private val fileUtil: FileUtil) {
             }
             .addOnFailureListener {
                 Log.e("modelManager", "Erro ao baixar modelo padrão", it)
+                onFailure()
+            }
+    }
+
+    fun getAllLanguages(): List<LanguageModel> {
+        return TranslateLanguage.getAllLanguages().map {
+            LanguageModel(
+                id = it,
+                name = translatableLanguageModels[it] ?: it,
+                downloadState = DownloadState.NOT_DOWNLOADED,
+                size = ""
+            )
+        }
+    }
+
+    fun getDownloadedModels(
+        onSuccess: (List<LanguageModel>) -> Unit = {},
+        onFailure: () -> Unit = {}
+    ) {
+        val modelManager = RemoteModelManager.getInstance()
+
+        modelManager.getDownloadedModels(TranslateRemoteModel::class.java)
+            .addOnSuccessListener { models: MutableSet<TranslateRemoteModel> ->
+                val languageModels = mutableListOf<LanguageModel>()
+
+                models.forEach { model ->
+                    try {
+                        languageModels.add(
+                            LanguageModel(
+                                id = model.language,
+                                name = translatableLanguageModels[model.language] ?: model.language,
+                                downloadState = DownloadState.DOWNLOADED,
+                                size = fileUtil.getSizeModel(model.modelNameForBackend)
+                            )
+                        )
+                    } catch (e: Exception) {
+                        Log.e("getDownloadedModels", "Erro ao obter modelo:", e)
+                    }
+                }
+                onSuccess(languageModels)
+            }
+            .addOnFailureListener {
                 onFailure()
             }
     }
