@@ -8,9 +8,6 @@ import com.alura.mail.mlkit.TextTranslator
 import com.alura.mail.model.Language
 import com.alura.mail.samples.EmailDao
 import com.alura.mail.ui.navigation.emailIdArgument
-import com.google.mlkit.common.model.DownloadConditions
-import com.google.mlkit.common.model.RemoteModelManager
-import com.google.mlkit.nl.translate.TranslateRemoteModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -145,6 +142,23 @@ class ContentEmailViewModel @Inject constructor(
             selectedEmail?.let { email ->
                 languageIdentified?.let { languageIdentified ->
                     localLanguage?.let { localLanguage ->
+                        textTranslator.textTranslate(
+                            text = email.content,
+                            targetLanguage = localLanguage.code,
+                            sourceLanguage = languageIdentified.code,
+                            onSuccess = { translatedText ->
+                                _uiState.value = _uiState.value.copy(
+                                    selectedEmail = email.copy(
+                                        content = translatedText
+                                    ),
+                                    translatedState = TranslatedState.TRANSLATED
+                                )
+                                translateSubject()
+                            },
+                            onFailure = {
+
+                            }
+                        )
                     }
                 }
             }
@@ -156,6 +170,19 @@ class ContentEmailViewModel @Inject constructor(
             selectedEmail?.let { email ->
                 languageIdentified?.let { languageIdentified ->
                     localLanguage?.let { localLanguage ->
+                        textTranslator.textTranslate(
+                            email.subject,
+                            targetLanguage = localLanguage.code,
+                            sourceLanguage = languageIdentified.code,
+                            onSuccess = { translatedText ->
+                                _uiState.value = _uiState.value.copy(
+                                    selectedEmail = email.copy(
+                                        subject = translatedText
+                                    ),
+                                )
+                            },
+                            onFailure = {}
+                        )
                     }
                 }
             }
