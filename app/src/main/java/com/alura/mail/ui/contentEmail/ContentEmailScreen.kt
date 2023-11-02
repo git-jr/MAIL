@@ -1,8 +1,14 @@
 package com.alura.mail.ui.contentEmail
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.provider.CalendarContract
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -24,6 +31,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -32,17 +40,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ShareCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.alura.mail.R
 import com.alura.mail.extensions.toFormattedDate
 import com.alura.mail.model.Email
 import com.alura.mail.ui.components.LoadScreen
 import com.alura.mail.ui.settings.LanguageDialog
+import java.lang.Exception
+import kotlin.math.max
 
 @Composable
 fun ContentEmailScreen() {
@@ -79,6 +94,52 @@ fun ContentEmailScreen() {
                 }
             }
             EmailContent(email)
+            // Lista de chips de sugestão
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Row(
+                    modifier = Modifier
+                        .horizontalScroll(rememberScrollState())
+                        .padding(horizontal = 8.dp)
+                ) {
+                    state.suggestions.forEach { suggestion ->
+                        SuggestionChip(
+                            modifier = Modifier.padding(horizontal = 4.dp),
+                            onClick = {
+                                if (suggestion.action == SuggestionAction.SMART_REPLY) {
+                                    viewModel.addReply(suggestion.text)
+                                } else {
+                                    viewModel.setSelectSuggestion(suggestion)
+                                }
+                            },
+                            label = {
+                                Text(
+                                    suggestion.text,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier.widthIn(max = 100.dp)
+                                )
+                            },
+                            shape = CircleShape,
+                            icon = {
+                                suggestion.icon?.let {
+                                    Icon(
+                                        painter = painterResource(id = suggestion.icon),
+                                        contentDescription = suggestion.text,
+                                        tint = Color.Gray,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
+                            },
+                        )
+                    }
+                }
+            }
+
+            state.selectedSuggestion?.let { suggestion ->
+                ExecuteAction(suggestion)
+            }
         }
 
         if (state.showDownloadLanguageDialog) {
@@ -249,4 +310,115 @@ fun EmailContent(email: Email) {
         modifier = Modifier.padding(16.dp),
         fontSize = MaterialTheme.typography.titleMedium.fontSize,
     )
+}
+
+
+@Composable
+fun ExecuteAction(suggestion: Suggestion) {
+    // o ideial é elevar isso aqui para um local que já tenha o context
+    val context = LocalContext.current
+    when (suggestion.action) {
+        SuggestionAction.ADDRESS -> {
+            openMaps(context, suggestion.text)
+        }
+
+        SuggestionAction.DATE_TIME -> {
+            addEvent(context, suggestion.text)
+        }
+
+        SuggestionAction.EMAIL -> {
+            sendEmail(context, suggestion.text)
+        }
+
+        SuggestionAction.PHONE_NUMBER -> {
+            callPhone(context, suggestion.text)
+        }
+
+        SuggestionAction.URL -> {
+            openUrl(context, suggestion.text)
+        }
+
+        else -> {
+            CopyToTransferArea(suggestion.text)
+        }
+    }
+}
+
+
+@Composable
+private fun CopyToTransferArea(text: String) {
+    val clipboardManager = LocalClipboardManager.current
+    clipboardManager.setText(AnnotatedString(text))
+
+    val context = LocalContext.current
+    Toast.makeText(context, "Copiado para área de transferência", Toast.LENGTH_SHORT).show()
+
+//    val clipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+//    val clipData = ClipData.newPlainText("text", text)
+//    clipboardManager.setPrimaryClip(clipData)
+}
+
+private fun callPhone(context: Context, text: String) {
+    val intent = Intent(Intent.ACTION_CALL)
+    intent.data = Uri.parse("tel:$text")
+    context.startActivity(intent)
+}
+
+private fun sendEmail(context: Context, text: String) {
+    val intent = Intent(Intent.ACTION_SENDTO).apply {
+        data = Uri.parse("mailto:")
+        putExtra(Intent.EXTRA_EMAIL, arrayOf(text))
+        putExtra(Intent.EXTRA_SUBJECT, "Assunto do e-mail");
+        putExtra(Intent.EXTRA_TEXT, "Corpo do e-mail");
+    }
+    context.startActivity(intent)
+}
+
+
+private fun openCalendar(context: Context, text: String) {
+    val intent = Intent(Intent.ACTION_VIEW)
+    intent.data = Uri.parse("content://com.android.calendar/time/$text")
+    context.startActivity(intent)
+}
+
+private fun createCalendarEvent(context: Context, eventDetails: String) {
+    val intent = Intent(Intent.ACTION_INSERT)
+    intent.data = CalendarContract.Events.CONTENT_URI
+    intent.putExtra(CalendarContract.Events.TITLE, eventDetails)
+//    intent.putExtra(CalendarContract.Events.EVENT_LOCATION, "Localização do Evento") // Opcional, se aplicável
+//    intent.putExtra(CalendarContract.Events.DESCRIPTION, "Descrição do Evento") // Opcional, se aplicável
+//    intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, System.currentTimeMillis())
+//    intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, System.currentTimeMillis() + 3600000) // 1 hora após o início
+//    intent.putExtra(CalendarContract.Events.ALL_DAY, 0) // Define como 0 para eventos com hora específica
+    context.startActivity(intent)
+}
+
+fun addEvent(
+    context: Context,
+    title: String,
+    location: String = "",
+    begin: Long = 0,
+    end: Long = 0
+) {
+    val intent = Intent(Intent.ACTION_INSERT).apply {
+        data = CalendarContract.Events.CONTENT_URI
+        putExtra(CalendarContract.Events.TITLE, title)
+        putExtra(CalendarContract.Events.EVENT_LOCATION, location)
+        putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, begin)
+        putExtra(CalendarContract.EXTRA_EVENT_END_TIME, end)
+    }
+    context.startActivity(intent)
+}
+
+
+private fun openMaps(context: Context, text: String) {
+    val intent = Intent(Intent.ACTION_VIEW)
+    intent.data = Uri.parse("geo:0,0?q=$text")
+    context.startActivity(intent)
+}
+
+private fun openUrl(context: Context, text: String) {
+    val intent = Intent(Intent.ACTION_VIEW)
+    intent.data = Uri.parse(text)
+    context.startActivity(intent)
 }

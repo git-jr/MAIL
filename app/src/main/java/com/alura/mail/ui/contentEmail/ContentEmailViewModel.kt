@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.alura.mail.R
 import com.alura.mail.mlkit.TextTranslator
 import com.alura.mail.model.Language
 import com.alura.mail.samples.EmailDao
@@ -29,6 +30,45 @@ class ContentEmailViewModel @Inject constructor(
 
     init {
         loadEmail()
+        loadSuggestions()
+    }
+
+    private fun loadSuggestions() {
+        viewModelScope.launch {
+            val entitySuggestions = listOf(
+//                Suggestion("Ir para site", SuggestionAction.URL, R.drawable.ic_link),
+//                Suggestion("Ligue", SuggestionAction.PHONE_NUMBER, R.drawable.ic_call),
+//                Suggestion("Envie email", SuggestionAction.EMAIL, R.drawable.ic_email),
+//                Suggestion("Abrir Maps", SuggestionAction.ADDRESS, R.drawable.ic_location),
+                Suggestion("2019/09/29, let's meet tomorrow at 6pm", SuggestionAction.DATE_TIME, R.drawable.ic_copy),
+                Suggestion("Torre Eiffel", SuggestionAction.ADDRESS, R.drawable.ic_location),
+                Suggestion("Rua Vergueiro, 3185 - São Paulo,", SuggestionAction.ADDRESS, R.drawable.ic_location),
+                Suggestion("juniorrr77@gmail.com", SuggestionAction.EMAIL, R.drawable.ic_email),
+                Suggestion("https://www.youtube.com/@Paradoxo10", SuggestionAction.URL, R.drawable.ic_link),
+                Suggestion("4002-8922", SuggestionAction.PHONE_NUMBER, R.drawable.ic_call),
+                Suggestion("IBAN", SuggestionAction.IBAN, R.drawable.ic_copy),
+                Suggestion(
+                    "Cartão de crédito",
+                    SuggestionAction.PAYMENT_CARD_NUMBER,
+                    R.drawable.ic_copy
+                ),
+                Suggestion(
+                    "Número de rastreio",
+                    SuggestionAction.TRACKING_NUMBER,
+                    R.drawable.ic_copy
+                ),
+            )
+
+            val smartSuggestions = listOf(
+                Suggestion("Bom dia"),
+                Suggestion("Ok"),
+                Suggestion("Combinado"),
+            )
+
+            _uiState.value = _uiState.value.copy(
+                suggestions = entitySuggestions + smartSuggestions
+            )
+        }
     }
 
     private fun loadEmail() {
@@ -215,4 +255,17 @@ class ContentEmailViewModel @Inject constructor(
             showTranslateButton = false
         )
     }
+
+    fun addReply(text: String) {
+        TODO("Not yet implemented")
+    }
+
+    fun setSelectSuggestion(suggestion: Suggestion) {
+        _uiState.value = _uiState.value.copy(
+            selectedSuggestion = suggestion
+        )
+    }
+
 }
+
+
