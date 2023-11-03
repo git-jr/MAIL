@@ -5,11 +5,13 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alura.mail.R
+import com.alura.mail.mlkit.EntityExtractor
 import com.alura.mail.mlkit.TextTranslator
 import com.alura.mail.model.Language
 import com.alura.mail.samples.EmailDao
 import com.alura.mail.ui.navigation.emailIdArgument
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -31,18 +33,31 @@ class ContentEmailViewModel @Inject constructor(
     init {
         loadEmail()
         loadSuggestions()
-        loadEntities()
+
+        viewModelScope.launch {
+            delay(3000)
+            loadEntities()
+        }
     }
 
     private fun loadEntities() {
-        val initRangeTest = 0
-        val endRangeTest = 10
+        val entityExtraction = EntityExtractor()
+        entityExtraction.gentRanges(
+            text = _uiState.value.selectedEmail?.content ?: return,
+            onSuccess = {
+                _uiState.value = _uiState.value.copy(
+                    rangeList = it
+                )
 
-        val entityList = listOf(Entity("teste", "teste", initRangeTest, endRangeTest))
-
-        _uiState.value = _uiState.value.copy(
-            entityList = entityList
+                Log.e("entityExtractor", "Tamanho: ${it.size}")
+            }
         )
+
+//        val entityList = listOf(Entity("teste", "teste", initRangeTest, endRangeTest))
+//
+//        _uiState.value = _uiState.value.copy(
+//            entityList = entityList
+//        )
     }
 
     private fun loadSuggestions() {

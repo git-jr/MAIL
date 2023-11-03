@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.CalendarContract
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -24,6 +25,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
@@ -49,11 +52,15 @@ import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.alura.mail.R
 import com.alura.mail.extensions.toFormattedDate
@@ -95,7 +102,7 @@ fun ContentEmailScreen() {
                     )
                 }
             }
-            EmailContent(email)
+            EmailContent(email, state.rangeList)
             // Lista de chips de sugestão
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -268,7 +275,6 @@ private fun EmailHeader(email: Email) {
                     )
                 }
 
-
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -302,18 +308,82 @@ private fun EmailHeader(email: Email) {
 }
 
 @Composable
-fun EmailContent(email: Email) {
+fun EmailContent(email: Email, rangeList: List<IntRange> = emptyList()) {
     Text(
         text = email.subject,
         modifier = Modifier.padding(16.dp),
         fontSize = MaterialTheme.typography.titleLarge.fontSize,
     )
 
-    Text(
-        text = email.content,
-        modifier = Modifier.padding(16.dp),
-        fontSize = MaterialTheme.typography.titleMedium.fontSize,
-    )
+    if (rangeList.isNotEmpty()) {
+        MountHiText(email.content, rangeList)
+    } else {
+        Text(
+            text = email.content,
+            modifier = Modifier.padding(16.dp),
+            style = TextStyle(fontSize = 18.sp)
+        )
+    }
+}
+
+
+@Composable
+fun MountHiText(content: String, rangeList: List<IntRange> = emptyList()) {
+
+    val context = LocalContext.current
+    var textLabel = AnnotatedString("")
+    var currentRange = 0
+
+    rangeList.forEachIndexed { index, it ->
+        val normalText = content.substring(currentRange, it.first)
+        val linkText = content.substring(it.first, it.last)
+        val tempText = buildAnnotatedString {
+            append(normalText)
+            withStyle(
+                style = SpanStyle(
+                    textDecoration = TextDecoration.Underline
+                )
+            ) { append(linkText) }
+
+            addStringAnnotation(
+                tag = index.toString(),
+                annotation = linkText,
+                start = it.first,
+                end = it.last
+            )
+        }
+        textLabel = textLabel.plus(tempText)
+        currentRange = it.last
+    }
+
+    textLabel.spanStyles.forEachIndexed { index, spanStyle ->
+        Log.e("spanStyles", "all ranges $index: ${spanStyle.start} - ${spanStyle.end}")
+    }
+    SelectionContainer {
+        ClickableText(
+            modifier = Modifier.padding(16.dp),
+            style = TextStyle(
+                fontSize = 18.sp,
+                color = MaterialTheme.colorScheme.onBackground
+            ),
+            text = textLabel,
+            onClick = { offset ->
+                val tagIndex = textLabel.spanStyles.indexOfFirst { offset in it.start until it.end }
+
+                if (tagIndex > -1) {
+                    val entity = textLabel.getStringAnnotations(
+                        start = 0,
+                        end = Int.MAX_VALUE // o ideal seria "textLabel.length" mas ele não está pegando o tamanho completo do texto
+                    )[tagIndex]
+                    Log.i("spanStyles", "offset: $offset")
+                    Log.e("spanStyles", "annotations: ${entity.item}")
+
+                    copyToTransferArea(context, entity.item)
+                }
+            }
+        )
+    }
+
 }
 
 @Composable

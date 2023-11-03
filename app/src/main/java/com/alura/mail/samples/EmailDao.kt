@@ -14,8 +14,19 @@ class EmailDao {
         return listOfEmails.firstOrNull { it.id == id }
     }
 
-
     private val listOfEmails = listOf(
+        Email(
+            id = "0",
+            subject = "Respoats inteligentes",
+            content = "Fala aí John, tudo bem? Esse é o local que falei: 221B Baker Street, Reino Unido " +
+                    "Vejo você lá às 16:19, qualquer coisa pode ligar nesse número: 4002-8922 ou manda msg" +
+                    "por aqui: teste@gmail.com. Na dúvida, dá uma olhada no https://www.alura.com.br/ " +
+                    "O valor valor do metro aqui é £ 2,78 que dá uns R$ 1.500 reais kkkkk" +
+                    "Ah mais uma coisa, não esquece meus US$100, meu IBAN é: GB15MIDL40051512345678",
+            time = 1697824497961,
+            color = 0xFFFF0057,
+            user = User("Lestrade")
+        ),
         Email(
             id = "1",
             subject = "Idioma não traduzivel de exemplo",
