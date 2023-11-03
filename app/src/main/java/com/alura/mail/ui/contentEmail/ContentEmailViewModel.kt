@@ -31,6 +31,18 @@ class ContentEmailViewModel @Inject constructor(
     init {
         loadEmail()
         loadSuggestions()
+        loadEntities()
+    }
+
+    private fun loadEntities() {
+        val initRangeTest = 0
+        val endRangeTest = 10
+
+        val entityList = listOf(Entity("teste", "teste", initRangeTest, endRangeTest))
+
+        _uiState.value = _uiState.value.copy(
+            entityList = entityList
+        )
     }
 
     private fun loadSuggestions() {
@@ -40,11 +52,23 @@ class ContentEmailViewModel @Inject constructor(
 //                Suggestion("Ligue", SuggestionAction.PHONE_NUMBER, R.drawable.ic_call),
 //                Suggestion("Envie email", SuggestionAction.EMAIL, R.drawable.ic_email),
 //                Suggestion("Abrir Maps", SuggestionAction.ADDRESS, R.drawable.ic_location),
-                Suggestion("2019/09/29, let's meet tomorrow at 6pm", SuggestionAction.DATE_TIME, R.drawable.ic_copy),
+                Suggestion(
+                    "2019/09/29, let's meet tomorrow at 6pm",
+                    SuggestionAction.DATE_TIME,
+                    R.drawable.ic_copy
+                ),
                 Suggestion("Torre Eiffel", SuggestionAction.ADDRESS, R.drawable.ic_location),
-                Suggestion("Rua Vergueiro, 3185 - São Paulo,", SuggestionAction.ADDRESS, R.drawable.ic_location),
+                Suggestion(
+                    "Rua Vergueiro, 3185 - São Paulo,",
+                    SuggestionAction.ADDRESS,
+                    R.drawable.ic_location
+                ),
                 Suggestion("juniorrr77@gmail.com", SuggestionAction.EMAIL, R.drawable.ic_email),
-                Suggestion("https://www.youtube.com/@Paradoxo10", SuggestionAction.URL, R.drawable.ic_link),
+                Suggestion(
+                    "https://www.youtube.com/@Paradoxo10",
+                    SuggestionAction.URL,
+                    R.drawable.ic_link
+                ),
                 Suggestion("4002-8922", SuggestionAction.PHONE_NUMBER, R.drawable.ic_call),
                 Suggestion("IBAN", SuggestionAction.IBAN, R.drawable.ic_copy),
                 Suggestion(

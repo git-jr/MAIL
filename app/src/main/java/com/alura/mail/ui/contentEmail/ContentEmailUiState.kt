@@ -14,7 +14,8 @@ data class ContentEmailUiState(
     val showDownloadLanguageDialog: Boolean = false,
     val showTranslateButton: Boolean = true,
     val suggestions: List<Suggestion> = emptyList(),
-    val selectedSuggestion: Suggestion? = null
+    val selectedSuggestion: Suggestion? = null,
+    val entityList: List<Entity> = emptyList()
 )
 
 enum class TranslatedState {
@@ -30,6 +31,13 @@ data class Suggestion(
     val icon: Int? = null
 )
 
+data class Entity(
+    val text: String,
+    val type: String,
+    val start: Int,
+    val end: Int
+)
+
 enum class SuggestionAction {
     SMART_REPLY,
     ADDRESS,
@@ -38,6 +46,8 @@ enum class SuggestionAction {
     PHONE_NUMBER,
     URL,
     IBAN,
+    ISBN,
     PAYMENT_CARD_NUMBER,
     TRACKING_NUMBER,
+    FLIGHT_NUMBER
 }

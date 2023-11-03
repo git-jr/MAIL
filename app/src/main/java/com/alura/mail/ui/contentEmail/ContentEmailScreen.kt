@@ -1,5 +1,7 @@
 package com.alura.mail.ui.contentEmail
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -42,6 +44,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -49,15 +53,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.app.ShareCompat
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.alura.mail.R
 import com.alura.mail.extensions.toFormattedDate
 import com.alura.mail.model.Email
 import com.alura.mail.ui.components.LoadScreen
 import com.alura.mail.ui.settings.LanguageDialog
-import java.lang.Exception
-import kotlin.math.max
 
 @Composable
 fun ContentEmailScreen() {
@@ -140,6 +142,8 @@ fun ContentEmailScreen() {
             state.selectedSuggestion?.let { suggestion ->
                 ExecuteAction(suggestion)
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
         }
 
         if (state.showDownloadLanguageDialog) {
@@ -312,7 +316,6 @@ fun EmailContent(email: Email) {
     )
 }
 
-
 @Composable
 fun ExecuteAction(suggestion: Suggestion) {
     // o ideial é elevar isso aqui para um local que já tenha o context
@@ -339,14 +342,14 @@ fun ExecuteAction(suggestion: Suggestion) {
         }
 
         else -> {
-            CopyToTransferArea(suggestion.text)
+            CopyToTransferAreaCompose(suggestion.text)
         }
     }
 }
 
 
 @Composable
-private fun CopyToTransferArea(text: String) {
+fun CopyToTransferAreaCompose(text: String) {
     val clipboardManager = LocalClipboardManager.current
     clipboardManager.setText(AnnotatedString(text))
 
@@ -356,6 +359,14 @@ private fun CopyToTransferArea(text: String) {
 //    val clipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
 //    val clipData = ClipData.newPlainText("text", text)
 //    clipboardManager.setPrimaryClip(clipData)
+}
+
+
+fun copyToTransferArea(context: Context, text: String) {
+    val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    val clipData = ClipData.newPlainText("text", text)
+    clipboardManager.setPrimaryClip(clipData)
+    Toast.makeText(context, "Copiado para área de transferência: $text", Toast.LENGTH_SHORT).show()
 }
 
 private fun callPhone(context: Context, text: String) {
@@ -371,25 +382,6 @@ private fun sendEmail(context: Context, text: String) {
         putExtra(Intent.EXTRA_SUBJECT, "Assunto do e-mail");
         putExtra(Intent.EXTRA_TEXT, "Corpo do e-mail");
     }
-    context.startActivity(intent)
-}
-
-
-private fun openCalendar(context: Context, text: String) {
-    val intent = Intent(Intent.ACTION_VIEW)
-    intent.data = Uri.parse("content://com.android.calendar/time/$text")
-    context.startActivity(intent)
-}
-
-private fun createCalendarEvent(context: Context, eventDetails: String) {
-    val intent = Intent(Intent.ACTION_INSERT)
-    intent.data = CalendarContract.Events.CONTENT_URI
-    intent.putExtra(CalendarContract.Events.TITLE, eventDetails)
-//    intent.putExtra(CalendarContract.Events.EVENT_LOCATION, "Localização do Evento") // Opcional, se aplicável
-//    intent.putExtra(CalendarContract.Events.DESCRIPTION, "Descrição do Evento") // Opcional, se aplicável
-//    intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, System.currentTimeMillis())
-//    intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, System.currentTimeMillis() + 3600000) // 1 hora após o início
-//    intent.putExtra(CalendarContract.Events.ALL_DAY, 0) // Define como 0 para eventos com hora específica
     context.startActivity(intent)
 }
 
@@ -421,4 +413,10 @@ private fun openUrl(context: Context, text: String) {
     val intent = Intent(Intent.ACTION_VIEW)
     intent.data = Uri.parse(text)
     context.startActivity(intent)
+}
+
+@Composable
+private fun OpenUrlCompose(context: Context, text: String) {
+    val uriHandler: UriHandler = LocalUriHandler.current
+    uriHandler.openUri(text)
 }
