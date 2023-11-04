@@ -67,6 +67,7 @@ import com.alura.mail.extensions.toFormattedDate
 import com.alura.mail.model.Email
 import com.alura.mail.ui.components.LoadScreen
 import com.alura.mail.ui.settings.LanguageDialog
+import java.util.Calendar
 
 @Composable
 fun ContentEmailScreen() {
@@ -424,11 +425,7 @@ fun CopyToTransferAreaCompose(text: String) {
     clipboardManager.setText(AnnotatedString(text))
 
     val context = LocalContext.current
-    Toast.makeText(context, "Copiado para área de transferência", Toast.LENGTH_SHORT).show()
-
-//    val clipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-//    val clipData = ClipData.newPlainText("text", text)
-//    clipboardManager.setPrimaryClip(clipData)
+    Toast.makeText(context, "Copiado para área de transferência: $text", Toast.LENGTH_SHORT).show()
 }
 
 
@@ -462,6 +459,36 @@ fun addEvent(
     begin: Long = 0,
     end: Long = 0
 ) {
+    // base code: https://developer.android.com/guide/topics/providers/calendar-provider?hl=pt-br#intent-insert
+    val startMillis: Long = Calendar.getInstance().run {
+        set(2023, 11, 3, 7, 30)
+        timeInMillis
+    }
+    val endMillis: Long = Calendar.getInstance().run {
+        set(2012, 11, 3, 8, 30)
+        timeInMillis
+    }
+    val intent = Intent(Intent.ACTION_INSERT)
+        .setData(CalendarContract.Events.CONTENT_URI)
+        .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, startMillis)
+        .putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, true)
+//        .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endMillis)
+        .putExtra(CalendarContract.Events.TITLE, title)
+        .putExtra(CalendarContract.Events.DESCRIPTION, "Group class")
+        .putExtra(CalendarContract.Events.EVENT_LOCATION, "The gym")
+        .putExtra(CalendarContract.Events.AVAILABILITY, CalendarContract.Events.AVAILABILITY_BUSY)
+        .putExtra(Intent.EXTRA_EMAIL, "rowan@example.com,trevor@example.com")
+
+    context.startActivity(intent)
+}
+
+fun addEventOld(
+    context: Context,
+    title: String,
+    location: String = "",
+    begin: Long = 0,
+    end: Long = 0
+) {
     val intent = Intent(Intent.ACTION_INSERT).apply {
         data = CalendarContract.Events.CONTENT_URI
         putExtra(CalendarContract.Events.TITLE, title)
@@ -471,7 +498,6 @@ fun addEvent(
     }
     context.startActivity(intent)
 }
-
 
 private fun openMaps(context: Context, text: String) {
     val intent = Intent(Intent.ACTION_VIEW)

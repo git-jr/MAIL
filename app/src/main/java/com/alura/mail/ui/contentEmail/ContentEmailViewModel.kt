@@ -32,10 +32,10 @@ class ContentEmailViewModel @Inject constructor(
 
     init {
         loadEmail()
-        loadSuggestions()
+        // loadFakeSuggestions()
 
         viewModelScope.launch {
-            delay(3000)
+            delay(1000)
             loadEntities()
         }
     }
@@ -53,14 +53,18 @@ class ContentEmailViewModel @Inject constructor(
             }
         )
 
-//        val entityList = listOf(Entity("teste", "teste", initRangeTest, endRangeTest))
-//
-//        _uiState.value = _uiState.value.copy(
-//            entityList = entityList
-//        )
+        entityExtraction.extractSuggestion(
+            text = _uiState.value.selectedEmail?.content ?: return,
+            onSuccess = {
+                _uiState.value = _uiState.value.copy(
+                    suggestions = entityExtraction.entityToSuggestionAction(it)
+                )
+                Log.e("entityExtractor", "Tamanho: ${_uiState.value.suggestions}")
+            }
+        )
     }
 
-    private fun loadSuggestions() {
+    private fun loadFakeSuggestions() {
         viewModelScope.launch {
             val entitySuggestions = listOf(
 //                Suggestion("Ir para site", SuggestionAction.URL, R.drawable.ic_link),

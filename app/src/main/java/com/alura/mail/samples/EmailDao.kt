@@ -16,6 +16,14 @@ class EmailDao {
 
     private val listOfEmails = listOf(
         Email(
+            id = "-1",
+            subject = "Smart Replys - My flight",
+            content = "My flight is LX373, please pick me up at 8am tomorrow.",
+            time = 1697824497961,
+            color = 0xFFFF0057,
+            user = User("Ms. Hudson")
+        ),
+        Email(
             id = "0",
             subject = "Respoats inteligentes",
             content = "Fala aí John, tudo bem? Esse é o local que falei: 221B Baker Street, Reino Unido " +

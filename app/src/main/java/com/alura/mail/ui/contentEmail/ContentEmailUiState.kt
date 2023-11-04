@@ -32,23 +32,18 @@ data class Suggestion(
     val icon: Int? = null
 )
 
-data class Entity(
-    val text: String,
-    val type: String,
-    val start: Int,
-    val end: Int
-)
-
 enum class SuggestionAction {
-    SMART_REPLY,
-    ADDRESS,
-    DATE_TIME,
-    EMAIL,
-    PHONE_NUMBER,
-    URL,
-    IBAN,
-    ISBN,
-    PAYMENT_CARD_NUMBER,
-    TRACKING_NUMBER,
-    FLIGHT_NUMBER
+    SMART_REPLY, // 0
+    ADDRESS, // 1
+    DATE_TIME, // 2
+    EMAIL, // 3
+    FLIGHT_NUMBER, // 4
+    IBAN, // 5
+    ISBN, // 6
+    PAYMENT_CARD_NUMBER, // 7
+    PHONE_NUMBER,  // 8
+    TRACKING_NUMBER, // 9
+    URL, // 10
+    MONEY, // 11
 }
+
