@@ -1,6 +1,7 @@
 package com.alura.mail.mlkit
 
 import android.util.Log
+import com.alura.mail.ui.contentEmail.Suggestion
 import com.alura.mail.util.FileUtil
 import com.google.mlkit.nl.smartreply.SmartReply
 import com.google.mlkit.nl.smartreply.SmartReplySuggestionResult
@@ -12,8 +13,11 @@ class ResponseGenerator(private val fileUtil: FileUtil) {
         onSuccess: (List<String>) -> Unit = {},
         onFailure: () -> Unit = {}
     ) {
+
+        Log.i("loadSmartSuggestions", "messages: $messages")
+
         val suggestions = mutableListOf<String>()
-        val totalTexts = messages.size
+        val totalTexts = 3 // sempre são geradas 3 sugestões
         var textsTranslated = 0
 
         val smartReplyGenerator = SmartReply.getClient()
@@ -26,7 +30,7 @@ class ResponseGenerator(private val fileUtil: FileUtil) {
                             SmartReplySuggestionResult.STATUS_SUCCESS -> {
                                 for (suggestion in result.suggestions) {
                                     val replyText = suggestion.text
-                                    Log.i("Respondedor", "Suggestão: $replyText")
+                                    Log.i("generateResponse", "Suggestão: $replyText")
 
                                     val textTranslator = TextTranslator(fileUtil)
 
@@ -36,7 +40,8 @@ class ResponseGenerator(private val fileUtil: FileUtil) {
                                         sourceLanguage,
                                         targetLanguage,
                                         onSuccess = { translatedText ->
-                                            Log.i("Respondedor", "traduzdio: $translatedText")
+                                            suggestions.add(translatedText)
+                                            Log.i("generateResponse", "traduzido: $translatedText")
                                             textsTranslated++
                                             if (textsTranslated == totalTexts) {
                                                 onSuccess(suggestions)
@@ -48,13 +53,13 @@ class ResponseGenerator(private val fileUtil: FileUtil) {
 
                             SmartReplySuggestionResult.STATUS_NOT_SUPPORTED_LANGUAGE -> {
                                 onFailure()
-                                Log.e("Respondedor", "Error idioma não suportado")
+                                Log.e("generateResponse", "Error idioma não suportado")
                             }
 
 
                             SmartReplySuggestionResult.STATUS_NO_REPLY -> {
                                 onFailure()
-                                Log.e("Respondedor", "Erro: Sem respostas")
+                                Log.e("generateResponse", "Erro: Sem respostas")
                             }
                         }
                     }
@@ -109,70 +114,6 @@ class ResponseGenerator(private val fileUtil: FileUtil) {
         }
     }
 
-
-//    fun generateResponseOld() {
-//
-////        val fakeConversation = listOf(
-////            Pair("Oi, tudo bem?", true),
-////            Pair("Tudo bem e você?", false),
-////            Pair("Tudo ótimo", true),
-////        )
-//
-////        val fakeConversation = listOf(
-////            Pair("Hi, how are you?", true),
-////            Pair("I'm fine, and you?", false),
-////            Pair("I'm fine too", true),
-////        )
-//
-//        val smartReplyGenerator = SmartReply.getClient()
-//
-//        val fakeConversation = listOf(
-//            Pair("Estamos entrando contato referente a vaga de desenvolvedor Android", false),
-//        )
-//
-//        generateTextMessage(
-//            fakeConversation = fakeConversation,
-//            onSuccess = { translatedList ->
-//                smartReplyGenerator.suggestReplies(translatedList)
-//                    .addOnSuccessListener { result ->
-//                        when (result.status) {
-//                            SmartReplySuggestionResult.STATUS_NOT_SUPPORTED_LANGUAGE -> {
-//                                Log.e("Respondedor", "Error idioma não suportado")
-//                            }
-//
-//                            SmartReplySuggestionResult.STATUS_SUCCESS -> {
-//                                for (suggestion in result.suggestions) {
-//                                    val replyText = suggestion.text
-//                                    Log.i("Respondedor", "Suggestão: $replyText")
-//
-//                                    val textTranslator = TextTranslator(fileUtil)
-//
-//                                    val sourceLanguage = "en"
-//                                    val targetLanguage = "pt"
-//                                    textTranslator.textTranslate(replyText,
-//                                        sourceLanguage,
-//                                        targetLanguage,
-//                                        onSuccess = { translatedText ->
-//                                            Log.i("Respondedor", "traduzdio: $translatedText")
-//                                        }
-//                                    )
-//                                }
-//                            }
-//
-//                            SmartReplySuggestionResult.STATUS_NO_REPLY -> {
-//                                Log.e("Respondedor", "Erro: Sem respostas")
-//                            }
-//                        }
-//                    }
-//                    .addOnFailureListener {
-//                        // Task failed with an exception
-//                        // ...
-//                        Log.e("Respondedor", "Error", it)
-//                    }
-//            }
-//        )
-//    }
-
     fun conversationSample() {
         val conversation = mutableListOf<TextMessage>()
         conversation.add(
@@ -186,6 +127,21 @@ class ResponseGenerator(private val fileUtil: FileUtil) {
                 "Running late, sorry!", System.currentTimeMillis(), "userId"
             )
         )
+    }
+
+    fun messageToSuggestionAction(messages: List<String>): List<Suggestion> {
+        Log.i("messageToSuggestionAction", "messages: $messages")
+        return messages.map { message ->
+            Suggestion(message)
+        }
+    }
+
+    fun messageToSuggestionActionOld(messages: List<String>): List<Suggestion> {
+        val suggestions = mutableListOf<Suggestion>()
+        messages.forEach { message ->
+            suggestions.add(Suggestion(message))
+        }
+        return suggestions
     }
 
 }

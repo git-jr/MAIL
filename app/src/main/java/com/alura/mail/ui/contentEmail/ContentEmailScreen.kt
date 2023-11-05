@@ -113,7 +113,7 @@ fun ContentEmailScreen() {
             }
             EmailContent(email, state.rangeList)
 
-            RepliesContainer(state)
+            RepliesContainer(email.replies)
 
             SmartSuggestionsContainer(viewModel)
 
@@ -156,7 +156,7 @@ fun ContentEmailScreen() {
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
-                            text = stringResource(R.string.response),
+                            text = stringResource(R.string.reply),
                             modifier = Modifier.padding(8.dp),
                         )
                     }
@@ -187,8 +187,8 @@ fun ContentEmailScreen() {
 }
 
 @Composable
-private fun RepliesContainer(state: ContentEmailUiState) {
-    state.replies.forEach { reply ->
+private fun RepliesContainer(replies: List<Email>) {
+    replies.forEach { reply ->
         ExpandableEmailItem(reply)
     }
 }
@@ -387,11 +387,14 @@ private fun EmailHeader(email: Email) {
 
 @Composable
 fun EmailContent(email: Email, rangeList: List<IntRange> = emptyList()) {
-    Text(
-        text = email.subject,
-        modifier = Modifier.padding(16.dp),
-        fontSize = MaterialTheme.typography.titleLarge.fontSize,
-    )
+
+    if (email.subject.isNotEmpty()) {
+        Text(
+            text = email.subject,
+            modifier = Modifier.padding(16.dp),
+            fontSize = MaterialTheme.typography.titleLarge.fontSize,
+        )
+    }
 
     if (rangeList.isNotEmpty()) {
         MountHiText(email.content, rangeList)

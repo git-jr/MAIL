@@ -15,9 +15,7 @@ data class ContentEmailUiState(
     val showTranslateButton: Boolean = true,
     val suggestions: List<Suggestion> = emptyList(),
     val selectedSuggestion: Suggestion? = null,
-    val rangeList: List<IntRange> = emptyList(),
-    val replies: List<Email> = emptyList()
-
+    val rangeList: List<IntRange> = emptyList()
 )
 
 enum class TranslatedState {

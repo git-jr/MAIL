@@ -21,6 +21,5 @@
     <string name="no_languages_available">Nenhum idioma disponível ainda</string>
     <string name="loading">Carregando…</string>
     <string name="reply">Responder</string>
-    <string name="response">Resposta</string>
     <string name="add_reply">Adicionar resposta</string>
 </resources>
