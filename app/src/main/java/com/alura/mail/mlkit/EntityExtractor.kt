@@ -14,7 +14,6 @@ import com.google.mlkit.nl.entityextraction.FlightNumberEntity
 import com.google.mlkit.nl.entityextraction.MoneyEntity
 
 class EntityExtractor {
-
     fun extractSuggestion(
         text: String,
         onSuccess: (List<EntityInfo>) -> Unit = {},
@@ -198,25 +197,22 @@ class EntityExtractor {
 
     }
 
+    val entityType = mapOf(
+        1 to "Endereço",
+        2 to "Data e Hora",
+        3 to "E-mail",
+        4 to "Número de Voo",
+        5 to "IBAN",
+        6 to "ISBN",
+        7 to "Cartão de Pagamento",
+        8 to "Telefone",
+        9 to "Número de Rastreamento",
+        10 to "URL",
+        11 to "Dinheiro"
+    )
+
+    data class EntityInfo(
+        val entityText: String,
+        val action: SuggestionAction = SuggestionAction.SMART_REPLY,
+    )
 }
-
-
-val entityType = mapOf(
-    1 to "Endereço",
-    2 to "Data e Hora",
-    3 to "E-mail",
-    4 to "Número de Voo",
-    5 to "IBAN",
-    6 to "ISBN",
-    7 to "Cartão de Pagamento",
-    8 to "Telefone",
-    9 to "Número de Rastreamento",
-    10 to "URL",
-    11 to "Dinheiro"
-)
-
-
-data class EntityInfo(
-    val entityText: String,
-    val action: SuggestionAction = SuggestionAction.SMART_REPLY,
-)

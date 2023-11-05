@@ -50,7 +50,7 @@ class TextTranslator(private val fileUtil: FileUtil) {
         sourceLanguage: String,
         targetLanguage: String,
         onSuccess: (String) -> Unit,
-        onFailure: () -> Unit
+        onFailure: () -> Unit = {}
     ) {
         val options = TranslatorOptions.Builder()
             .setSourceLanguage(sourceLanguage)
@@ -69,7 +69,6 @@ class TextTranslator(private val fileUtil: FileUtil) {
             }
             .addOnCompleteListener { translator.close() }
     }
-
 
     fun verifyModelDownloaded(
         targetLanguage: String,
