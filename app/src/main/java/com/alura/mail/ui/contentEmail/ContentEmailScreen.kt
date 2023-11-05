@@ -9,6 +9,7 @@ import android.provider.CalendarContract
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -31,16 +32,23 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.Send
+import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -104,51 +112,55 @@ fun ContentEmailScreen() {
                 }
             }
             EmailContent(email, state.rangeList)
-            // Lista de chips de sugestão
-            Spacer(modifier = Modifier.height(16.dp))
 
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Row(
-                    modifier = Modifier
-                        .horizontalScroll(rememberScrollState())
-                        .padding(horizontal = 8.dp)
-                ) {
-                    state.suggestions.forEach { suggestion ->
-                        SuggestionChip(
-                            modifier = Modifier.padding(horizontal = 4.dp),
-                            onClick = {
-                                if (suggestion.action == SuggestionAction.SMART_REPLY) {
-                                    viewModel.addReply(suggestion.text)
-                                } else {
-                                    viewModel.setSelectSuggestion(suggestion)
-                                }
-                            },
-                            label = {
-                                Text(
-                                    suggestion.text,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                    modifier = Modifier.widthIn(max = 100.dp)
+            RepliesContainer(state)
+
+            SmartSuggestionsContainer(viewModel)
+
+            // Botão de responder
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+            ) {
+
+                Spacer(modifier = Modifier.height(16.dp))
+                var showEditTextField by remember { mutableStateOf(false) }
+
+                if (showEditTextField) {
+                    var replyState by remember { mutableStateOf("") }
+                    OutlinedTextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = replyState,
+                        onValueChange = { replyState = it },
+                        label = {
+                            Text(text = stringResource(R.string.search_email))
+                        },
+                        trailingIcon = {
+                            IconButton(onClick = {
+                                showEditTextField = false
+                                viewModel.addReply(replyState)
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Send,
+                                    contentDescription = stringResource(R.string.add_reply),
+                                    tint = Color.Gray,
+                                    modifier = Modifier.size(24.dp)
                                 )
-                            },
-                            shape = CircleShape,
-                            icon = {
-                                suggestion.icon?.let {
-                                    Icon(
-                                        painter = painterResource(id = suggestion.icon),
-                                        contentDescription = suggestion.text,
-                                        tint = Color.Gray,
-                                        modifier = Modifier.size(18.dp)
-                                    )
-                                }
-                            },
+                            }
+                        }
+                    )
+                } else {
+                    OutlinedButton(
+                        onClick = { showEditTextField = true },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = stringResource(R.string.response),
+                            modifier = Modifier.padding(8.dp),
                         )
                     }
                 }
-            }
-
-            state.selectedSuggestion?.let { suggestion ->
-                ExecuteAction(suggestion)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -171,6 +183,64 @@ fun ContentEmailScreen() {
         }
     } ?: run {
         LoadScreen()
+    }
+}
+
+@Composable
+private fun RepliesContainer(state: ContentEmailUiState) {
+    state.replies.forEach { reply ->
+        ExpandableEmailItem(reply)
+    }
+}
+
+@Composable
+private fun SmartSuggestionsContainer(
+    viewModel: ContentEmailViewModel
+) {
+    val state by viewModel.uiState.collectAsState()
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Spacer(modifier = Modifier.height(16.dp))
+        Row(
+            modifier = Modifier
+                .horizontalScroll(rememberScrollState())
+                .padding(horizontal = 8.dp)
+        ) {
+            state.suggestions.forEach { suggestion ->
+                SuggestionChip(
+                    modifier = Modifier.padding(horizontal = 4.dp),
+                    onClick = {
+                        if (suggestion.action == SuggestionAction.SMART_REPLY) {
+                            viewModel.addReply(suggestion.text)
+                        } else {
+                            viewModel.setSelectSuggestion(suggestion)
+                        }
+                    },
+                    label = {
+                        Text(
+                            suggestion.text,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.widthIn(max = 100.dp)
+                        )
+                    },
+                    shape = CircleShape,
+                    icon = {
+                        suggestion.icon?.let {
+                            Icon(
+                                painter = painterResource(id = suggestion.icon),
+                                contentDescription = suggestion.text,
+                                tint = Color.Gray,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+                    },
+                )
+            }
+        }
+
+        state.selectedSuggestion?.let { suggestion ->
+            ExecuteAction(suggestion)
+        }
     }
 }
 
@@ -269,11 +339,18 @@ private fun EmailHeader(email: Email) {
                         .background(Color(email.color)),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Text(
-                        text = email.user.name.first().toString(),
-                        color = Color.White,
-                        fontSize = 22.sp,
-                    )
+                    if (email.subject.isNotEmpty()) {
+                        Text(
+                            text = email.user.name.first().toString(),
+                            color = Color.White,
+                            fontSize = 22.sp,
+                        )
+                    } else {
+                        Image(
+                            painter = painterResource(id = R.drawable.profile_pic),
+                            contentDescription = "Usuário"
+                        )
+                    }
                 }
 
                 Row(
@@ -418,6 +495,21 @@ fun ExecuteAction(suggestion: Suggestion) {
     }
 }
 
+
+@Composable
+private fun ExpandableEmailItem(email: Email) {
+    val isExpanded = remember { mutableStateOf(false) }
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { isExpanded.value = !isExpanded.value }
+    ) {
+        EmailHeader(email = email)
+        if (isExpanded.value) {
+            EmailContent(email)
+        }
+    }
+}
 
 @Composable
 fun CopyToTransferAreaCompose(text: String) {

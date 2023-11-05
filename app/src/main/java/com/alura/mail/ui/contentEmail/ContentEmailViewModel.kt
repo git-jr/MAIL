@@ -7,7 +7,9 @@ import androidx.lifecycle.viewModelScope
 import com.alura.mail.R
 import com.alura.mail.mlkit.EntityExtractor
 import com.alura.mail.mlkit.TextTranslator
+import com.alura.mail.model.Email
 import com.alura.mail.model.Language
+import com.alura.mail.model.User
 import com.alura.mail.samples.EmailDao
 import com.alura.mail.ui.navigation.emailIdArgument
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,6 +18,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.Locale
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
@@ -33,6 +36,7 @@ class ContentEmailViewModel @Inject constructor(
     init {
         loadEmail()
         // loadFakeSuggestions()
+        loadReplies()
 
         viewModelScope.launch {
             delay(1000)
@@ -61,6 +65,12 @@ class ContentEmailViewModel @Inject constructor(
                 )
                 Log.e("entityExtractor", "Tamanho: ${_uiState.value.suggestions}")
             }
+        )
+    }
+
+    private fun loadReplies() {
+        _uiState.value = _uiState.value.copy(
+            replies = emailDao.getEmails().take(3)
         )
     }
 
@@ -300,7 +310,16 @@ class ContentEmailViewModel @Inject constructor(
     }
 
     fun addReply(text: String) {
-        TODO("Not yet implemented")
+        _uiState.value = _uiState.value.copy(
+            replies = _uiState.value.replies + Email(
+                subject = "",
+                content = text,
+                id = UUID.randomUUID().toString(),
+                time = System.currentTimeMillis(),
+                color = 0XFF8F4F24,
+                user = User("Você"),
+            )
+        )
     }
 
     fun setSelectSuggestion(suggestion: Suggestion) {
