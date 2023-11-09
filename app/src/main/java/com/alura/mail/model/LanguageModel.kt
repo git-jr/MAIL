@@ -4,7 +4,7 @@ data class LanguageModel(
     val id: String,
     val name: String,
     val downloadState: DownloadState,
-    val size: String
+    val size: String = ""
 )
 
 enum class DownloadState {
