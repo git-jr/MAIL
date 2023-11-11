@@ -9,9 +9,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
+import com.alura.mail.mlkit.translatableLanguageModels
 import com.alura.mail.ui.navigation.HomeNavHost
 import com.alura.mail.ui.theme.MAILTheme
 import com.google.mlkit.nl.languageid.LanguageIdentification
+import com.google.mlkit.nl.languageid.LanguageIdentifier.UNDETERMINED_LANGUAGE_TAG
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -27,22 +29,43 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     HomeNavHost(navController = navController)
 
-                    val text = "Hello mundo buenos dias!"
-                    val languageIdentifier = LanguageIdentification.getClient()
-                    languageIdentifier.identifyPossibleLanguages(text)
-                        .addOnSuccessListener { identifiedLanguages ->
-                            for (identifiedLanguage in identifiedLanguages) {
-                                val language = identifiedLanguage.languageTag
-                                val confidence = identifiedLanguage.confidence
-                                Log.i("language", "$language $confidence")
-                            }
+                    val text = ""
+                    languageIdentifier(
+                        text,
+                        onSuccess = { languageName ->
+                            Log.i("language", languageName)
+                        },
+                        onFailure = {
+                            Log.i("language", "falha ao tentar identificar o idioma")
                         }
-                        .addOnFailureListener {
-                            Log.e("language", "error", it)
-                        }
+                    )
                 }
             }
         }
+    }
+
+    private fun languageIdentifier(
+        text: String,
+        onSuccess: (String) -> Unit = {},
+        onFailure: () -> Unit = {}
+    ) {
+        val languageIdentifier = LanguageIdentification.getClient()
+        languageIdentifier.identifyLanguage(text)
+            .addOnSuccessListener {
+                val languageName =
+                    translatableLanguageModels[it] ?: UNDETERMINED_LANGUAGE_TAG
+                if (languageName == UNDETERMINED_LANGUAGE_TAG) {
+                    onFailure()
+                    Log.i("language", "undetermined")
+                } else {
+                    onSuccess(languageName)
+                    Log.i("language", languageName)
+                }
+            }
+            .addOnFailureListener {
+                onFailure()
+                Log.e("language", "error", it)
+            }
     }
 }
 
