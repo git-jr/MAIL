@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.alura.mail.mlkit.translatableLanguageModels
@@ -29,43 +30,13 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     HomeNavHost(navController = navController)
 
-                    val text = ""
-                    languageIdentifier(
-                        text,
-                        onSuccess = { languageName ->
-                            Log.i("language", languageName)
-                        },
-                        onFailure = {
-                            Log.i("language", "falha ao tentar identificar o idioma")
-                        }
-                    )
+                    val text = "Hello mundo buenos dias!"
                 }
             }
         }
     }
 
-    private fun languageIdentifier(
-        text: String,
-        onSuccess: (String) -> Unit = {},
-        onFailure: () -> Unit = {}
-    ) {
-        val languageIdentifier = LanguageIdentification.getClient()
-        languageIdentifier.identifyLanguage(text)
-            .addOnSuccessListener {
-                val languageName =
-                    translatableLanguageModels[it] ?: UNDETERMINED_LANGUAGE_TAG
-                if (languageName == UNDETERMINED_LANGUAGE_TAG) {
-                    onFailure()
-                    Log.i("language", "undetermined")
-                } else {
-                    onSuccess(languageName)
-                    Log.i("language", languageName)
-                }
-            }
-            .addOnFailureListener {
-                onFailure()
-                Log.e("language", "error", it)
-            }
-    }
+
 }
+
 
