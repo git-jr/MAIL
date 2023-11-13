@@ -45,6 +45,15 @@ class ContentEmailViewModel @Inject constructor(
 
     private fun identifyEmailLanguage() {
         _uiState.value.selectedEmail?.let { email ->
+            textTranslator.languageIdentifier(
+                text = email.content,
+                onSuccess = { language ->
+                    _uiState.value = _uiState.value.copy(
+                        languageIdentified = language
+                    )
+                    verifyIfNeedTranslate()
+                },
+            )
         }
     }
 
