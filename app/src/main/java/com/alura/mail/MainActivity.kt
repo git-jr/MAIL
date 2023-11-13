@@ -34,15 +34,20 @@ class MainActivity : ComponentActivity() {
 
                     val text = "Uma arquitethura separada"
 
-                    TextTranslator(FileUtil(this)).textTranslate(
+                    val textTranslator = TextTranslator(FileUtil(this))
+
+                    textTranslator.languageIdentifier(
                         text = text,
-                        sourceLanguage = TranslateLanguage.PORTUGUESE,
-                        targetLanguage = TranslateLanguage.ENGLISH,
-                        onSuccess = { textTranslated ->
-                            Log.i("translator", "tradução $textTranslated")
-                        },
-                        onFailure = {
-                            Log.e("translator", "erro")
+                        onSuccess = {
+                            textTranslator.verifyDownloadModel(
+                                modelCode = it.code,
+                                onSuccess = {
+                                    Log.i("verifyDownloadModel", "Modelo disponivel para ${it.name}")
+                                },
+                                onFailure = {
+                                    Log.e("verifyDownloadModel", "Modelo indisponivel para ${it.name}")
+                                }
+                            )
                         }
                     )
                 }
