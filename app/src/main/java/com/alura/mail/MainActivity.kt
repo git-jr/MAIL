@@ -9,8 +9,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
+import com.alura.mail.mlkit.TextTranslator
 import com.alura.mail.ui.navigation.HomeNavHost
 import com.alura.mail.ui.theme.MAILTheme
+import com.alura.mail.util.FileUtil
 import com.google.mlkit.common.model.DownloadConditions
 import com.google.mlkit.nl.translate.TranslateLanguage
 import com.google.mlkit.nl.translate.Translation
@@ -30,33 +32,19 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     HomeNavHost(navController = navController)
 
-                    val text = "Bom dia, como vai você?"
-                    // Create an English-German translator:
-                    val options = TranslatorOptions.Builder()
-                        .setSourceLanguage(TranslateLanguage.PORTUGUESE)
-                        .setTargetLanguage(TranslateLanguage.ENGLISH)
-                        .build()
-                    val translator = Translation.getClient(options)
+                    val text = "Uma arquitethura separada"
 
-
-                    val conditions = DownloadConditions.Builder()
-                        .requireWifi()
-                        .build()
-
-                    translator.downloadModelIfNeeded(conditions)
-                        .addOnSuccessListener {
-                            Log.i("translator", "modelo baixado")
-                            translator.translate(text)
-                                .addOnSuccessListener {
-                                    Log.i("translator", "text: $text, translated: $it")
-                                }
-                                .addOnFailureListener {
-                                    Log.e("translator", "error: $it")
-                                }
+                    TextTranslator(FileUtil(this)).textTranslate(
+                        text = text,
+                        sourceLanguage = TranslateLanguage.PORTUGUESE,
+                        targetLanguage = TranslateLanguage.ENGLISH,
+                        onSuccess = { textTranslated ->
+                            Log.i("translator", "tradução $textTranslated")
+                        },
+                        onFailure = {
+                            Log.e("translator", "erro")
                         }
-                        .addOnFailureListener {
-                            Log.e("translator", "modelo não baixado")
-                        }
+                    )
                 }
             }
         }
