@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.alura.mail.ui.navigation.HomeNavHost
 import com.alura.mail.ui.theme.MAILTheme
+import com.google.mlkit.common.model.DownloadConditions
 import com.google.mlkit.nl.translate.TranslateLanguage
 import com.google.mlkit.nl.translate.Translation
 import com.google.mlkit.nl.translate.TranslatorOptions
@@ -29,19 +30,32 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     HomeNavHost(navController = navController)
 
-                    val text = "Hello World!"
+                    val text = "Bom dia, como vai você?"
                     // Create an English-German translator:
                     val options = TranslatorOptions.Builder()
-                        .setSourceLanguage(TranslateLanguage.ENGLISH)
-                        .setTargetLanguage(TranslateLanguage.PORTUGUESE)
+                        .setSourceLanguage(TranslateLanguage.PORTUGUESE)
+                        .setTargetLanguage(TranslateLanguage.ENGLISH)
                         .build()
                     val translator = Translation.getClient(options)
-                    translator.translate(text)
+
+
+                    val conditions = DownloadConditions.Builder()
+                        .requireWifi()
+                        .build()
+
+                    translator.downloadModelIfNeeded(conditions)
                         .addOnSuccessListener {
-                            Log.i("translate", "text: $text, translated: $it")
+                            Log.i("translator", "modelo baixado")
+                            translator.translate(text)
+                                .addOnSuccessListener {
+                                    Log.i("translator", "text: $text, translated: $it")
+                                }
+                                .addOnFailureListener {
+                                    Log.e("translator", "error: $it")
+                                }
                         }
                         .addOnFailureListener {
-                            Log.e("translate", "error: $it")
+                            Log.e("translator", "modelo não baixado")
                         }
                 }
             }
