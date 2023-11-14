@@ -73,7 +73,7 @@ class TextTranslator(private val fileUtil: FileUtil) {
 
         modelManager.getDownloadedModels(TranslateRemoteModel::class.java)
             .addOnSuccessListener { models ->
-                if (models.any { it.language  == modelCode }) {
+                if (models.any { it.language == modelCode }) {
                     onSuccess()
                 } else {
                     onFailure()
@@ -83,6 +83,28 @@ class TextTranslator(private val fileUtil: FileUtil) {
                 onFailure()
             }
 
+    }
+
+
+    fun downloadModel(
+        modelName: String,
+        onSuccess: () -> Unit = {},
+        onFailure: () -> Unit = {}
+    ) {
+        val model = TranslateRemoteModel.Builder(modelName).build()
+        val conditions = DownloadConditions.Builder()
+            .requireWifi()
+            .build()
+
+        val modelManager = RemoteModelManager.getInstance()
+
+        modelManager.download(model, conditions)
+            .addOnSuccessListener {
+                onSuccess()
+            }
+            .addOnFailureListener {
+                onFailure()
+            }
     }
 }
 

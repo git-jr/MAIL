@@ -1,5 +1,6 @@
 package com.alura.mail.ui.contentEmail
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -79,20 +80,15 @@ class ContentEmailViewModel @Inject constructor(
 
         val defaultLanguage = _uiState.value.localLanguage?.code.toString()
 
-        val model = TranslateRemoteModel.Builder(defaultLanguage).build()
-        val conditions = DownloadConditions.Builder()
-            .requireWifi()
-            .build()
-
-        val modelManager = RemoteModelManager.getInstance()
-
-        modelManager.download(model, conditions)
-            .addOnSuccessListener {
-                // Model downloaded.
+        textTranslator.downloadModel(
+            modelName = defaultLanguage,
+            onSuccess = {
+                Log.i("defaultLanguage", "Modelo default baixado com sucesso")
+            },
+            onFailure = {
+                Log.e("defaultLanguage", "Modelo default não baixado")
             }
-            .addOnFailureListener {
-                // Error.
-            }
+        )
     }
 
     private fun verifyIfNeedTranslate() {
@@ -170,6 +166,21 @@ class ContentEmailViewModel @Inject constructor(
 
     fun downloadLanguageModel() {
         val languageIdentified = _uiState.value.languageIdentified?.code ?: return
+
+        textTranslator.downloadModel(
+            modelName = languageIdentified,
+            onSuccess = {
+                translateEmail()
+                Log.i("downloadLanguageModel", "Modelo baixado com sucesso")
+            },
+            onFailure = {
+                _uiState.value = _uiState.value.copy(
+                    translatedState = TranslatedState.TRANSLATED
+                )
+                Log.e("downloadLanguageModel", "Modelo não baixado")
+            }
+        )
+
     }
 
     fun showDownloadLanguageDialog(show: Boolean) {
