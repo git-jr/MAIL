@@ -121,6 +121,20 @@ class ContentEmailViewModel @Inject constructor(
                     )
                 }
             } else {
+                val languageIdentified = _uiState.value.languageIdentified?.code.toString()
+
+                textTranslator.verifyDownloadModel(
+                    modelCode = languageIdentified,
+                    onSuccess = {
+                        tryTranslateEmail()
+                    },
+                    onFailure = {
+                        _uiState.value = _uiState.value.copy(
+                            showDownloadLanguageDialog = true
+                        )
+                    }
+                )
+
                 setTranslateState(TranslatedState.TRANSLATING)
             }
         }
