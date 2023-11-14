@@ -122,7 +122,7 @@ class ContentEmailViewModel @Inject constructor(
                 textTranslator.verifyDownloadModel(
                     modelCode = languageIdentified,
                     onSuccess = {
-                        tryTranslateEmail()
+                        translateEmail()
                     },
                     onFailure = {
                         _uiState.value = _uiState.value.copy(
@@ -147,6 +147,24 @@ class ContentEmailViewModel @Inject constructor(
             selectedEmail?.let { email ->
                 languageIdentified?.let { languageIdentified ->
                     localLanguage?.let { localLanguage ->
+                        textTranslator.textTranslate(
+                            text = email.content,
+                            sourceLanguage = languageIdentified.code,
+                            targetLanguage = localLanguage.code,
+                            onSuccess = {
+                                _uiState.value = _uiState.value.copy(
+                                    selectedEmail = email.copy(content = it),
+                                    translatedState = TranslatedState.TRANSLATED
+                                )
+
+                                translateSubject()
+                            },
+                            onFailure = {
+                                _uiState.value = _uiState.value.copy(
+                                    translatedState = TranslatedState.NOT_TRANSLATED
+                                )
+                            }
+                        )
                     }
                 }
             }
@@ -158,6 +176,21 @@ class ContentEmailViewModel @Inject constructor(
             selectedEmail?.let { email ->
                 languageIdentified?.let { languageIdentified ->
                     localLanguage?.let { localLanguage ->
+                        textTranslator.textTranslate(
+                            text = email.subject,
+                            sourceLanguage = languageIdentified.code,
+                            targetLanguage = localLanguage.code,
+                            onSuccess = {
+                                _uiState.value = _uiState.value.copy(
+                                    selectedEmail = email.copy(subject = it)
+                                )
+                            },
+                            onFailure = {
+                                _uiState.value = _uiState.value.copy(
+                                    translatedState = TranslatedState.NOT_TRANSLATED
+                                )
+                            }
+                        )
                     }
                 }
             }
@@ -175,7 +208,7 @@ class ContentEmailViewModel @Inject constructor(
             },
             onFailure = {
                 _uiState.value = _uiState.value.copy(
-                    translatedState = TranslatedState.TRANSLATED
+                    translatedState = TranslatedState.NOT_TRANSLATED
                 )
                 Log.e("downloadLanguageModel", "Modelo não baixado")
             }
