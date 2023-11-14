@@ -1,6 +1,7 @@
 package com.alura.mail.mlkit
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateListOf
 import com.alura.mail.model.DownloadState
 import com.alura.mail.model.Language
 import com.alura.mail.model.LanguageModel
@@ -118,6 +119,40 @@ class TextTranslator(private val fileUtil: FileUtil) {
                 size = fileUtil.getSizeModel(model)
             )
         }
+    }
+
+    fun getDownloadedModels(
+        onSuccess: (List<LanguageModel>) -> Unit = {},
+        onFailure: () -> Unit = {}
+    ) {
+        val modelManager = RemoteModelManager.getInstance()
+
+        modelManager.getDownloadedModels(TranslateRemoteModel::class.java)
+            .addOnSuccessListener { models ->
+                val languageModels = mutableListOf<LanguageModel>()
+
+                models.forEach { model ->
+                    try {
+                        languageModels.add(
+                            LanguageModel(
+                                id = model.language,
+                                name = translatableLanguageModels[model.language] ?: model.language,
+                                downloadState = DownloadState.DOWNLOADED,
+                                size = fileUtil.getSizeModel(model.modelNameForBackend)
+                            )
+                        )
+
+                        Log.i("getDownloadedModels", "model: ${model.modelNameForBackend}")
+                    } catch (e: Exception) {
+                        Log.e("getDownloadedModels", "error: $e")
+                    }
+                }
+
+                onSuccess(languageModels)
+            }
+            .addOnFailureListener {
+                onFailure()
+            }
     }
 }
 
