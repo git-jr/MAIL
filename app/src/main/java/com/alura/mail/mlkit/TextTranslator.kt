@@ -110,6 +110,24 @@ class TextTranslator(private val fileUtil: FileUtil) {
             }
     }
 
+    fun removeModel(
+        modelName: String,
+        onSuccess: () -> Unit = {},
+        onFailure: () -> Unit = {}
+    ) {
+        val model = TranslateRemoteModel.Builder(modelName).build()
+
+        val modelManager = RemoteModelManager.getInstance()
+
+        modelManager.deleteDownloadedModel(model)
+            .addOnSuccessListener {
+                onSuccess()
+            }
+            .addOnFailureListener {
+                onFailure()
+            }
+    }
+
     fun getAllModels(): List<LanguageModel> {
         return TranslateLanguage.getAllLanguages().map { model ->
             LanguageModel(
