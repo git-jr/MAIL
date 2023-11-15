@@ -37,6 +37,9 @@ class TextTranslator(private val fileUtil: FileUtil) {
             .addOnFailureListener {
                 onFailure()
             }
+            .addOnCompleteListener {
+                languageIdentifier.close()
+            }
     }
 
     fun textTranslate(
@@ -62,6 +65,9 @@ class TextTranslator(private val fileUtil: FileUtil) {
             .addOnFailureListener {
                 onFailure()
                 Log.e("translator", "error: $it")
+            }
+            .addOnCompleteListener {
+                translator.close()
             }
 
     }
